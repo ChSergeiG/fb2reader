@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.*?>
+<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8.0.121"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.chsergeig.fb2reader.controller.InfoAlertController">
+    <padding>
+        <Insets top="15.0" left="15.0" right="15.0" bottom="15.0"/>
+    </padding>
+    <TableView fx:id="tableView" AnchorPane.topAnchor="10.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0"
+               AnchorPane.rightAnchor="10.0">
+        <columns>
+            <TableColumn prefWidth="290.0">
+                <cellValueFactory>
+                    <PropertyValueFactory property="key"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="310.0">
+                <cellValueFactory>
+                    <PropertyValueFactory property="value"/>
+                </cellValueFactory>
+            </TableColumn>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <Button fx:id="close" mnemonicParsing="false" text="Close info" onAction="#handleClosePressed"
+            AnchorPane.leftAnchor="10.0"
+            AnchorPane.bottomAnchor="10.0"/>
+
+</AnchorPane>
