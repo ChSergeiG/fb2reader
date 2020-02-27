@@ -1,43 +1,76 @@
 package ru.chsergeig.fb2reader.misc;
 
-import javafx.scene.Node;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import org.jsoup.nodes.Element;
+import ru.chsergeig.fb2reader.BookHolder;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class BookContainer {
 
-    private BookContainer parent;
+    private final BookContainer parent;
+    private final Element element;
+    private final List<BookContainer> children = new LinkedList<>();
+    private final List<javafx.scene.Node> content = new LinkedList<>();
+    private String title;
 
-    private List<BookContainer> childrens;
-
-    private List<javafx.scene.Node> content;
 
     public BookContainer(Element root) {
-        this.parent = null;
-//        org.jsoup.nodes.Node fbNode = root.childNodes().stream().filter(node -> node instanceof Element).findFirst().get();
-//
-//        org.jsoup.nodes.Node title = fbNoderoot.childNodes().stream().filter(node -> node instanceof Element).findFirst().get();;
-//        content = operateNode(title);
-//        childrens = fbNode.childNodes().stream().filter(node -> node instanceof Element && ((Element) node).tagName().equals("section")).map(node -> new BookContainer((Element) node)).collect(Collectors.toList());
+        this(null, root);
+    }
+
+    private BookContainer(BookContainer parent, Element elementToContain) {
+        this.parent = parent;
+        this.element = elementToContain;
+        createContent();
+        elementToContain.children().stream()
+                .filter(node -> node.tagName().equals("section"))
+                .map(section -> new BookContainer(this, section))
+                .forEach(children::add);
+    }
+
+
+    private void createContent() {
+        Element titleNode = element.children().stream()
+                .filter(node -> node.tagName().equals("title"))
+                .findAny()
+                .orElse(null);
+        if (null != titleNode) {
+            title = titleNode.text();
+        } else {
+            title = "---------";
+        }
+        content.addAll(toTexts(titleNode));
+        element.children().stream()
+                .filter(node -> node.tagName().equals("title"))
+                .findAny()
+                .orElse(null);
+        content.addAll(toTexts(element));
+    }
+
+    public List<BookContainer> getChildren() {
+        return children;
+    }
+
+    public List<javafx.scene.Node> getContent() {
+        return content;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    private List<javafx.scene.Node> toTexts(Element element) {
+        if (null == element) {
+            return Collections.emptyList();
+        }
+        Text text = new Text(element.html());
+        text.setFont(Font.font("Consolas", BookHolder.fontSize));
+        return Collections.singletonList(text);
 
     }
 
-    private List<javafx.scene.Node> operateNode(org.jsoup.nodes.Node node) {
-        List<javafx.scene.Node> result = new ArrayList<>();
-        String toParse = node.outerHtml()
-                .replaceAll("&lt;", "<")
-                .replaceAll("&gt;", ">")
-                .replaceAll("<\\s*([/]?)\\s*(\\w+)\\s*([/]?)\\s*>", "<$1$2$3>")
-                .replaceAll("<([\\w\\d-]+)/>", "<$1></$1>");
-        toTexts(result, toParse);
-        return result;
-    }
-
-    private void toTexts(List<Node> result, String toParse) {
-        toParse.replaceAll("<\\s*([/]?)\\s*(\\w+)\\s*([/]?)\\s*>", "<$1$2$3>");
-
-
-    }
 }

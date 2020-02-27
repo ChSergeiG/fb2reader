@@ -30,6 +30,7 @@ public class Xmain extends Application {
         Parent root = FXMLLoader.load(Xmain.class.getClassLoader().getResource("main_window.fxml"));
         Scene scene = new Scene(root, 300, 300);
         scene.setFill(Color.WHITE);
+        scene.getStylesheets().add(Xmain.class.getClassLoader().getResource("css/application.css").toString());
 
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);

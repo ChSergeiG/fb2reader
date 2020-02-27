@@ -1,0 +1,10 @@
+.tree-cell {
+    -fx-font-family: Calibri;
+    -fx-wrap-text: true;
+    -fx-text-fill: black;
+    -fx-background-color: white;
+}
+.tree-cell:selected {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}

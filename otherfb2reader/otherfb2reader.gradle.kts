@@ -15,30 +15,30 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        signingConfigs {
-            named("debug").configure {
-                storeFile = file("debug.jks")
-                storePassword = "pass"
-                keyAlias = "keyAlias"
-                keyPassword = "otherPass"
-            }
-            register("release") {
-                storeFile = file("debug.jks")
-                storePassword = "pass"
-                keyAlias = "keyAlias"
-                keyPassword = "otherPass"
-            }
-        }
+//        signingConfigs {
+//            named("debug").configure {
+//                storeFile = file("debug.jks")
+//                storePassword = "pass"
+//                keyAlias = "keyAlias"
+//                keyPassword = "otherPass"
+//            }
+//            register("release") {
+//                storeFile = file("debug.jks")
+//                storePassword = "pass"
+//                keyAlias = "keyAlias"
+//                keyPassword = "otherPass"
+//            }
+//        }
         buildTypes {
-            named("debug").configure {
-                applicationIdSuffix = ".debug"
-                isMinifyEnabled = false
-            }
-
-            named("release").configure {
-                isMinifyEnabled = true
-                signingConfig = signingConfigs.getByName("release")
-            }
+//            named("debug").configure {
+//                applicationIdSuffix = ".debug"
+//                isMinifyEnabled = false
+//            }
+//
+//            named("release").configure {
+//                isMinifyEnabled = true
+//                signingConfig = signingConfigs.getByName("release")
+//            }
         }
     }
 }

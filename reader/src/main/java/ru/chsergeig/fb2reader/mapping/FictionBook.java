@@ -114,11 +114,11 @@ public class FictionBook {
     }
 
     private void initBookContainers() {
-        rootContainer = new BookContainer(StructureSupplier.BODY.getFirstElement());
+        rootContainer = new BookContainer(StructureSupplier.FICTIONBOOK.getFirstElement());
     }
 
     private void initMyFooter() {
-
+        myFooter = new MyFooter(StructureSupplier.MY_FOOTER.getFirstElement());
     }
 
     // region getters

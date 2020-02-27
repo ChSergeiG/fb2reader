@@ -21,6 +21,7 @@ public class BookHolder {
     private static Document book;
     private static FictionBook fictionBook;
     private static String validCharset;
+    public static double fontSize = 15.0d;
 
     public static void setBook(File file) {
         validCharset = TextUtils.getValidCharset(file);

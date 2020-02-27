@@ -36,6 +36,7 @@ public enum StructureSupplier {
     ISBN("publish-info > isbn"),
     // body
     MY_HEADER("myheader"),
+    FICTIONBOOK ("fictionbook"),
     BODY("body"),
     MY_FOOTER("myfooter"),
     // binaries

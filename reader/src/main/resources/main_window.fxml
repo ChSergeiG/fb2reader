@@ -4,7 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.TextFlow?>
-<GridPane fx:id="gridPane" fx:controller="ru.chsergeig.fb2reader.controller.MainWindowController" xmlns:fx="http://javafx.com/fxml">
+<GridPane fx:id="gridPane" fx:controller="ru.chsergeig.fb2reader.controller.MainWindowController"
+          xmlns:fx="http://javafx.com/fxml">
 
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="80.0" prefWidth="100.0"/>
@@ -16,7 +17,7 @@
         <RowConstraints vgrow="ALWAYS"/>
     </rowConstraints>
 
-    <MenuBar fx:id="menubar" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
+    <MenuBar fx:id="menubar" GridPane.columnIndex="0" GridPane.rowIndex="0">
         <Menu text="System">
             <MenuItem text="Exit" onAction="#handleExitButton"/>
         </Menu>
@@ -25,9 +26,16 @@
         </Menu>
     </MenuBar>
 
+    <ButtonBar GridPane.columnIndex="1" GridPane.rowIndex="0">
+        <buttons>
+            <Button text="F-" onAction="#handleFontDecrease"/>
+            <Button text="F+" onAction="#handleFontIncrease"/>
+        </buttons>
+    </ButtonBar>
+
     <ScrollPane GridPane.rowIndex="1" GridPane.columnIndex="0" hbarPolicy="NEVER">
         <VBox alignment="CENTER">
-            <TextFlow fx:id="main" prefWidth="1000" textAlignment="JUSTIFY">
+            <TextFlow fx:id="main">
                 <padding>
                     <Insets bottom="20.0" left="50.0" right="20.0" top="20.0"/>
                 </padding>
