@@ -1,20 +1,16 @@
 package ru.chsergeig.fb2reader.mapping.titleinfo;
 
-import javafx.scene.Node;
-import org.jsoup.nodes.Element;
-import ru.chsergeig.fb2reader.util.TextUtils;
-
-import java.util.List;
+import jodd.jerry.Jerry;
 
 public class Annotation {
 
-    private List<Node> texts;
+    private String text;
 
-    public Annotation(Element element) {
-        texts = TextUtils.toTexts(element);
+    public Annotation(Jerry element) {
+        text = element.text();
     }
 
-    public List<Node> getTexts() {
-        return texts;
+    public String getText() {
+        return text;
     }
 }

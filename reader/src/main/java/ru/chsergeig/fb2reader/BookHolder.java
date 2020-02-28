@@ -2,15 +2,16 @@ package ru.chsergeig.fb2reader;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import jodd.jerry.Jerry;
 import ru.chsergeig.fb2reader.mapping.FictionBook;
 import ru.chsergeig.fb2reader.mapping.common.Author;
 import ru.chsergeig.fb2reader.misc.BookInfoTableRow;
 import ru.chsergeig.fb2reader.util.TextUtils;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,22 +19,22 @@ import java.util.stream.Collectors;
 
 public class BookHolder {
 
-    private static Document book;
+    private static Jerry book;
     private static FictionBook fictionBook;
     private static String validCharset;
     public static double fontSize = 15.0d;
 
-    public static void setBook(File file) {
+    public static void setBook(Path file) {
         validCharset = TextUtils.getValidCharset(file);
         try {
-            book = Jsoup.parse(file, validCharset);
+            book = Jerry.jerry(String.join("\n", Files.readAllLines(file, Charset.forName(validCharset))));
         } catch (IOException e) {
             throw new RuntimeException("Cant parse book", e);
         }
         mapBookToFb2();
     }
 
-    public static Document getBook() {
+    public static Jerry getBook() {
         return book;
     }
 

@@ -1,6 +1,6 @@
 package ru.chsergeig.fb2reader.mapping;
 
-import org.jsoup.nodes.Element;
+import jodd.jerry.Jerry;
 import ru.chsergeig.fb2reader.mapping.body.MyFooter;
 import ru.chsergeig.fb2reader.mapping.body.MyHeader;
 import ru.chsergeig.fb2reader.mapping.common.Author;
@@ -9,15 +9,43 @@ import ru.chsergeig.fb2reader.mapping.documentinfo.History;
 import ru.chsergeig.fb2reader.mapping.titleinfo.Annotation;
 import ru.chsergeig.fb2reader.mapping.titleinfo.Sequence;
 import ru.chsergeig.fb2reader.misc.BookContainer;
-import ru.chsergeig.fb2reader.util.StructureSupplier;
 
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static ru.chsergeig.fb2reader.util.StructureSupplier.ANNOTATION;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.BINARY;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_AUTHOR;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_NAME;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_TITLE;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.CITY;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.COVERPAGE;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.DATE;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_AUTHOR;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_DATE;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_HISTORY;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_ID;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_PROGRAM_USED;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_SRC_OCR;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_SRC_URL;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_VERSION;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.FICTIONBOOK;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.GENRE;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.ISBN;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.KEYWORDS;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.LANG;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.MY_FOOTER;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.MY_HEADER;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.PUBLISHER;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.SEQUENCE;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.SRC_LANG;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.TRANSLATOR;
 import static ru.chsergeig.fb2reader.util.TextUtils.safeExtractValue;
 
 public class FictionBook {
@@ -69,56 +97,58 @@ public class FictionBook {
     }
 
     private void initBinaries() {
-        for (Element element : safeExtractValue(StructureSupplier.BINARY::getElements, new ArrayList<Element>())) {
-            Binary binary = new Binary(element);
+        Iterator<?> binariesItr = safeExtractValue(() -> BINARY.getElements().iterator(), Collections.emptyIterator());
+        while (binariesItr.hasNext()) {
+            Binary binary = new Binary((Jerry) binariesItr.next());
             binaries.put("#" + binary.getId(), binary);
         }
     }
 
     private void initTitleInfo() {
-        genre = safeExtractValue(() -> StructureSupplier.GENRE.getFirstElement().text(), "");
-        for (Element element : safeExtractValue(StructureSupplier.BOOK_AUTHOR::getElements, new ArrayList<Element>())) {
-            bookAuthors.add(new Author(element));
+        genre = safeExtractValue(() -> GENRE.getFirstElement().text(), "");
+        Iterator<?> authorIter = safeExtractValue(() -> BOOK_AUTHOR.getElements().iterator(), Collections.emptyIterator());
+        while (authorIter.hasNext()) {
+            bookAuthors.add(new Author((Jerry) authorIter.next()));
         }
-        bookTitle = safeExtractValue(() -> StructureSupplier.BOOK_TITLE.getFirstElement().text(), "");
-        annotation = new Annotation(StructureSupplier.ANNOTATION.getFirstElement());
-        keywords = safeExtractValue(() -> StructureSupplier.KEYWORDS.getFirstElement().text(), "");
-        date = safeExtractValue(() -> LocalDate.parse(StructureSupplier.DATE.getFirstElement().text()), LocalDate.ofEpochDay(0L));
-        coverpage = binaries.get(safeExtractValue(() -> StructureSupplier.COVERPAGE.getFirstElement().attr("l:href")));
-        lang = safeExtractValue(() -> StructureSupplier.LANG.getFirstElement().text(), "");
-        srcLang = safeExtractValue(() -> StructureSupplier.SRC_LANG.getFirstElement().text(), "");
-        translator = new Author(StructureSupplier.TRANSLATOR.getFirstElement());
-        sequence = new Sequence(StructureSupplier.SEQUENCE.getFirstElement());
+        bookTitle = safeExtractValue(() -> BOOK_TITLE.getFirstElement().text(), "");
+        annotation = new Annotation(ANNOTATION.getFirstElement());
+        keywords = safeExtractValue(() -> KEYWORDS.getFirstElement().text(), "");
+        date = safeExtractValue(() -> LocalDate.parse(DATE.getFirstElement().text()), LocalDate.ofEpochDay(0L));
+        coverpage = binaries.get(safeExtractValue(() -> COVERPAGE.getFirstElement().attr("l:href")));
+        lang = safeExtractValue(() -> LANG.getFirstElement().text(), "");
+        srcLang = safeExtractValue(() -> SRC_LANG.getFirstElement().text(), "");
+        translator = new Author(TRANSLATOR.getFirstElement());
+        sequence = new Sequence(SEQUENCE.getFirstElement());
     }
 
     private void initDocumentInfo() {
-        fb2Author = new Author(StructureSupplier.FB2_AUTHOR.getFirstElement());
-        programUsed = safeExtractValue(() -> StructureSupplier.FB2_PROGRAM_USED.getFirstElement().text(), "");
-        fb2Date = safeExtractValue(() -> LocalDate.parse(StructureSupplier.FB2_DATE.getFirstElement().attr("value")), LocalDate.ofEpochDay(0L));
-        fb2SrcUrl = safeExtractValue(URL.class, null, () -> StructureSupplier.FB2_SRC_URL.getFirstElement().text());
-        fb2SrcOcr = safeExtractValue(() -> StructureSupplier.FB2_SRC_OCR.getFirstElement().text(), "");
-        fb2id = safeExtractValue(() -> StructureSupplier.FB2_ID.getFirstElement().text(), "");
-        fb2Version = safeExtractValue(() -> StructureSupplier.FB2_VERSION.getFirstElement().text(), "");
-        fb2History = new History(StructureSupplier.FB2_HISTORY.getElements());
+        fb2Author = new Author(FB2_AUTHOR.getFirstElement());
+        programUsed = safeExtractValue(() -> FB2_PROGRAM_USED.getFirstElement().text(), "");
+        fb2Date = safeExtractValue(() -> LocalDate.parse(FB2_DATE.getFirstElement().attr("value")), LocalDate.ofEpochDay(0L));
+        fb2SrcUrl = safeExtractValue(URL.class, null, () -> FB2_SRC_URL.getFirstElement().text());
+        fb2SrcOcr = safeExtractValue(() -> FB2_SRC_OCR.getFirstElement().text(), "");
+        fb2id = safeExtractValue(() -> FB2_ID.getFirstElement().text(), "");
+        fb2Version = safeExtractValue(() -> FB2_VERSION.getFirstElement().text(), "");
+        fb2History = new History(FB2_HISTORY.getElements());
     }
 
     private void initPublishInfo() {
-        bookName = safeExtractValue(() -> StructureSupplier.BOOK_NAME.getFirstElement().text(), "");
-        publisher = safeExtractValue(() -> StructureSupplier.PUBLISHER.getFirstElement().text(), "");
-        city = safeExtractValue(() -> StructureSupplier.CITY.getFirstElement().text(), "");
-        isbn = safeExtractValue(() -> StructureSupplier.ISBN.getFirstElement().text(), "");
+        bookName = safeExtractValue(() -> BOOK_NAME.getFirstElement().text(), "");
+        publisher = safeExtractValue(() -> PUBLISHER.getFirstElement().text(), "");
+        city = safeExtractValue(() -> CITY.getFirstElement().text(), "");
+        isbn = safeExtractValue(() -> ISBN.getFirstElement().text(), "");
     }
 
     private void initMyHeader() {
-        myHeader = new MyHeader(StructureSupplier.MY_HEADER.getFirstElement());
+        myHeader = new MyHeader(MY_HEADER.getFirstElement());
     }
 
     private void initBookContainers() {
-        rootContainer = new BookContainer(StructureSupplier.FICTIONBOOK.getFirstElement());
+        rootContainer = new BookContainer(FICTIONBOOK.getFirstElement());
     }
 
     private void initMyFooter() {
-        myFooter = new MyFooter(StructureSupplier.MY_FOOTER.getFirstElement());
+        myFooter = new MyFooter(MY_FOOTER.getFirstElement());
     }
 
     // region getters

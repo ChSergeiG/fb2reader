@@ -1,17 +1,11 @@
 package ru.chsergeig.fb2reader.mapping.body;
 
-import javafx.scene.Node;
-import org.jsoup.nodes.Element;
+import jodd.jerry.Jerry;
 
-import java.util.ArrayList;
-import java.util.List;
+public class Section {
 
-public class Section  {
+    private String text;
 
-    List<Node> title = new ArrayList<>();
-
-    public Section(Element section) {
-
-
+    public Section(Jerry section) {
     }
 }

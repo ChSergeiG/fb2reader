@@ -1,21 +1,10 @@
 package ru.chsergeig.fb2reader.util;
 
-import javafx.scene.Node;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.text.Font;
-import javafx.scene.text.*;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
+import javafx.scene.text.Text;
 
-import java.awt.*;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -73,12 +62,11 @@ public class TextUtils {
         return result;
     }
 
-    public static String getValidCharset(File file) {
-        Path path = file.toPath();
+    public static String getValidCharset(Path file) {
         for (String charset : CHARSETS_TO_TEST) {
             String line;
             try {
-                BufferedReader bufferedReader = Files.newBufferedReader(path, Charset.forName(charset));
+                BufferedReader bufferedReader = Files.newBufferedReader(file, Charset.forName(charset));
                 line = bufferedReader.readLine();
             } catch (Exception e) {
                 continue;
@@ -93,134 +81,134 @@ public class TextUtils {
         throw new RuntimeException("Cant determine charset");
     }
 
-    public static List<Node> toTexts(Element element) {
-        List<Node> result = new ArrayList<>();
-        toTexts(element, result);
-        return result;
-    }
-
-    private static void toTexts(Element element, List<Node> texts) {
-        for (org.jsoup.nodes.Node node : element.childNodes()) {
-            if (node instanceof TextNode) {
-                Text text = new Text(((TextNode) node).text());
-                text.setFont(Font.font("Helvetica", 15));
-                texts.add(text);
-            } else if (node instanceof Element) {
-                switch (((Element) node).tagName()) {
-                    case "i":
-                        Text text = new Text(((Element) node).text());
-                        text.setFont(Font.font("Helvetica", FontPosture.ITALIC, 15));
-                        texts.add(text);
-                        break;
-                    case "strong":
-                        Text strongText = new Text(((Element) node).text());
-                        strongText.setFont(Font.font("Helvetica", FontWeight.BOLD, 15));
-                        texts.add(strongText);
-                        break;
-                    case "empty-line":
-                        Text emptyText = new Text("\r\n");
-                        emptyText.setFont(Font.font("Helvetica", 15));
-                        texts.add(emptyText);
-                        break;
-                    case "a":
-                        Hyperlink hyperText = new Hyperlink(((Element) node).text());
-                        hyperText.setFont(Font.font("Helvetica", FontPosture.ITALIC, 15));
-                        try {
-                            URI link = new URI(node.attr("l:href"));
-                            hyperText.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                                try {
-                                    Desktop.getDesktop().browse(link);
-                                } catch (IOException ignore) {
-                                }
-                            });
-                        } catch (URISyntaxException ignore) {
-                        }
-                        texts.add(hyperText);
-                        break;
-                    default:
-                        toTexts((Element) node, texts);
-                        break;
-                }
-            }
-        }
-    }
-
-    public static List<Node> convertHtmlToTexts(String html) {
-        // TITLE, CITE, LINK, BOLD, ITALIC
-        int modifier = 0b00000;
-        List<Node> result = new ArrayList<>();
-        String toTokenize = html;
-        int tokenStartPosition = toTokenize.indexOf('<');
-        int tokenFinishPosition = toTokenize.indexOf('>', tokenStartPosition);
-        String prevText = html.substring(0, tokenStartPosition);
-        if (prevText.trim().length() > 0) {
-            result.add(addTextWithModifiers(prevText, modifier));
-        }
-        String token = toTokenize.substring(tokenStartPosition + 1, tokenFinishPosition).trim();
-        if (token.contains("i")) {
-            if (token.contains("/")) {
-                modifier &= 0b11110;
-            } else {
-                modifier |= 0b00001;
-            }
-        } else if (token.contains("strong")) {
-            if (token.contains("/")) {
-                modifier &= 0b11101;
-            } else {
-                modifier |= 0b00010;
-            }
-
-        }
-
-        return result;
-    }
-
-    private static Node addTextWithModifiers(String prevText, int modifier) {
-        // title
-        if (0b1 == (modifier & 0b10000 >> 4)) {
-            Text titleText = new Text(prevText);
-            titleText.setFont(Font.font("Helvetica", 25.0));
-            titleText.setTextAlignment(TextAlignment.CENTER);
-            return titleText;
-        }
-        // cite
-        if (0b1 == (modifier & 0b1000 >> 3)) {
-            Text titleText = new Text(prevText);
-            titleText.setFont(Font.font("Helvetica", 15.0));
-            titleText.setTextAlignment(TextAlignment.RIGHT);
-            return titleText;
-        }
-        // link
-        if (0b10 == (modifier & 0b00010)) {
-            Hyperlink hyperText = new Hyperlink(prevText);
-            hyperText.setFont(ofModifier(modifier));
-            hyperText.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                try {
-                    Desktop.getDesktop().browse(new URI(""));
-                } catch (IOException | URISyntaxException ignore) {
-                }
-            });
-            return hyperText;
-        }
-        Text text = new Text(prevText);
-        text.setFont(ofModifier(modifier));
-        text.setTextAlignment(TextAlignment.JUSTIFY);
-        return text;
-    }
-
-    private static Font ofModifier(int modifier) {
-        int masked = 0b00011 & modifier;
-        switch (masked) {
-            case 0b00:
-                return Font.font("Helvetica", 15.0);
-            case 0b01:
-                return Font.font("Helvetica", FontPosture.ITALIC, 15.0);
-            case 0b10:
-                return Font.font("Helvetica", FontWeight.BOLD, 15.0);
-            case 0b11:
-                return Font.font("Helvetica", FontWeight.BOLD, FontPosture.ITALIC, 15.0);
-        }
-        return null;
-    }
+//    public static List<Node> toTexts(Element element) {
+//        List<Node> result = new ArrayList<>();
+//        toTexts(element, result);
+//        return result;
+//    }
+//
+//    private static void toTexts(Element element, List<Node> texts) {
+//        for (org.jsoup.nodes.Node node : element.childNodes()) {
+//            if (node instanceof TextNode) {
+//                Text text = new Text(((TextNode) node).text());
+//                text.setFont(Font.font("Helvetica", 15));
+//                texts.add(text);
+//            } else if (node instanceof Element) {
+//                switch (((Element) node).tagName()) {
+//                    case "i":
+//                        Text text = new Text(((Element) node).text());
+//                        text.setFont(Font.font("Helvetica", FontPosture.ITALIC, 15));
+//                        texts.add(text);
+//                        break;
+//                    case "strong":
+//                        Text strongText = new Text(((Element) node).text());
+//                        strongText.setFont(Font.font("Helvetica", FontWeight.BOLD, 15));
+//                        texts.add(strongText);
+//                        break;
+//                    case "empty-line":
+//                        Text emptyText = new Text("\r\n");
+//                        emptyText.setFont(Font.font("Helvetica", 15));
+//                        texts.add(emptyText);
+//                        break;
+//                    case "a":
+//                        Hyperlink hyperText = new Hyperlink(((Element) node).text());
+//                        hyperText.setFont(Font.font("Helvetica", FontPosture.ITALIC, 15));
+//                        try {
+//                            URI link = new URI(node.attr("l:href"));
+//                            hyperText.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+//                                try {
+//                                    Desktop.getDesktop().browse(link);
+//                                } catch (IOException ignore) {
+//                                }
+//                            });
+//                        } catch (URISyntaxException ignore) {
+//                        }
+//                        texts.add(hyperText);
+//                        break;
+//                    default:
+//                        toTexts((Element) node, texts);
+//                        break;
+//                }
+//            }
+//        }
+//    }
+//
+//    public static List<Node> convertHtmlToTexts(String html) {
+//        // TITLE, CITE, LINK, BOLD, ITALIC
+//        int modifier = 0b00000;
+//        List<Node> result = new ArrayList<>();
+//        String toTokenize = html;
+//        int tokenStartPosition = toTokenize.indexOf('<');
+//        int tokenFinishPosition = toTokenize.indexOf('>', tokenStartPosition);
+//        String prevText = html.substring(0, tokenStartPosition);
+//        if (prevText.trim().length() > 0) {
+//            result.add(addTextWithModifiers(prevText, modifier));
+//        }
+//        String token = toTokenize.substring(tokenStartPosition + 1, tokenFinishPosition).trim();
+//        if (token.contains("i")) {
+//            if (token.contains("/")) {
+//                modifier &= 0b11110;
+//            } else {
+//                modifier |= 0b00001;
+//            }
+//        } else if (token.contains("strong")) {
+//            if (token.contains("/")) {
+//                modifier &= 0b11101;
+//            } else {
+//                modifier |= 0b00010;
+//            }
+//
+//        }
+//
+//        return result;
+//    }
+//
+//    private static Node addTextWithModifiers(String prevText, int modifier) {
+//        // title
+//        if (0b1 == (modifier & 0b10000 >> 4)) {
+//            Text titleText = new Text(prevText);
+//            titleText.setFont(Font.font("Helvetica", 25.0));
+//            titleText.setTextAlignment(TextAlignment.CENTER);
+//            return titleText;
+//        }
+//        // cite
+//        if (0b1 == (modifier & 0b1000 >> 3)) {
+//            Text titleText = new Text(prevText);
+//            titleText.setFont(Font.font("Helvetica", 15.0));
+//            titleText.setTextAlignment(TextAlignment.RIGHT);
+//            return titleText;
+//        }
+//        // link
+//        if (0b10 == (modifier & 0b00010)) {
+//            Hyperlink hyperText = new Hyperlink(prevText);
+//            hyperText.setFont(ofModifier(modifier));
+//            hyperText.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+//                try {
+//                    Desktop.getDesktop().browse(new URI(""));
+//                } catch (IOException | URISyntaxException ignore) {
+//                }
+//            });
+//            return hyperText;
+//        }
+//        Text text = new Text(prevText);
+//        text.setFont(ofModifier(modifier));
+//        text.setTextAlignment(TextAlignment.JUSTIFY);
+//        return text;
+//    }
+//
+//    private static Font ofModifier(int modifier) {
+//        int masked = 0b00011 & modifier;
+//        switch (masked) {
+//            case 0b00:
+//                return Font.font("Helvetica", 15.0);
+//            case 0b01:
+//                return Font.font("Helvetica", FontPosture.ITALIC, 15.0);
+//            case 0b10:
+//                return Font.font("Helvetica", FontWeight.BOLD, 15.0);
+//            case 0b11:
+//                return Font.font("Helvetica", FontWeight.BOLD, FontPosture.ITALIC, 15.0);
+//        }
+//        return null;
+//    }
 
 }

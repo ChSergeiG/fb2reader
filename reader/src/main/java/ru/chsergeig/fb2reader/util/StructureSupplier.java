@@ -1,8 +1,6 @@
 package ru.chsergeig.fb2reader.util;
 
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import jodd.jerry.Jerry;
 import ru.chsergeig.fb2reader.BookHolder;
 
 public enum StructureSupplier {
@@ -36,7 +34,7 @@ public enum StructureSupplier {
     ISBN("publish-info > isbn"),
     // body
     MY_HEADER("myheader"),
-    FICTIONBOOK ("fictionbook"),
+    FICTIONBOOK("fictionbook"),
     BODY("body"),
     MY_FOOTER("myfooter"),
     // binaries
@@ -57,68 +55,68 @@ public enum StructureSupplier {
         return locator + " > " + additionalChain;
     }
 
-    public static Elements getElements(StructureSupplier supplier) {
+    public static Jerry getElements(StructureSupplier supplier) {
         return getElements(BookHolder.getBook(), supplier);
     }
 
-    public static Elements getElements(Document document, StructureSupplier supplier) {
-        return document.select(supplier.getLocator());
+    public static Jerry getElements(Jerry document, StructureSupplier supplier) {
+        return document.find(supplier.getLocator());
     }
 
-    public Elements getElements() {
+    public Jerry getElements() {
         return getElements(BookHolder.getBook());
     }
 
-    public Elements getElements(Document document) {
-        return document.select(getLocator());
+    public Jerry getElements(Jerry document) {
+        return document.find(getLocator());
     }
 
-    public static Elements getElements(StructureSupplier supplier, String additionalChain) {
+    public static Jerry getElements(StructureSupplier supplier, String additionalChain) {
         return getElements(BookHolder.getBook(), supplier, additionalChain);
     }
 
-    public static Elements getElements(Document document, StructureSupplier supplier, String additionalChain) {
-        return document.select(supplier.getLocator(additionalChain));
+    public static Jerry getElements(Jerry document, StructureSupplier supplier, String additionalChain) {
+        return document.find(supplier.getLocator(additionalChain));
     }
 
-    public Elements getElements(String additionalChain) {
+    public Jerry getElements(String additionalChain) {
         return getElements(BookHolder.getBook(), additionalChain);
     }
 
-    public Elements getElements(Document document, String additionalChain) {
-        return document.select(getLocator(additionalChain));
+    public Jerry getElements(Jerry document, String additionalChain) {
+        return document.find(getLocator(additionalChain));
     }
 
-    public static Element getFirstElement(StructureSupplier supplier) {
+    public static Jerry getFirstElement(StructureSupplier supplier) {
         return getFirstElement(BookHolder.getBook(), supplier);
     }
 
-    public static Element getFirstElement(Document document, StructureSupplier supplier) {
-        return document.select(supplier.getLocator()).first();
+    public static Jerry getFirstElement(Jerry document, StructureSupplier supplier) {
+        return document.find(supplier.getLocator()).first();
     }
 
-    public Element getFirstElement() {
+    public Jerry getFirstElement() {
         return getFirstElement(BookHolder.getBook());
     }
 
-    public Element getFirstElement(Document document) {
-        return document.select(getLocator()).first();
+    public Jerry getFirstElement(Jerry document) {
+        return document.find(getLocator()).first();
     }
 
-    public static Element getFirstElement(StructureSupplier supplier, String additionalChain) {
+    public static Jerry getFirstElement(StructureSupplier supplier, String additionalChain) {
         return getFirstElement(BookHolder.getBook(), supplier, additionalChain);
     }
 
-    public static Element getFirstElement(Document document, StructureSupplier supplier, String additionalChain) {
-        return document.select(supplier.getLocator(additionalChain)).first();
+    public static Jerry getFirstElement(Jerry document, StructureSupplier supplier, String additionalChain) {
+        return document.find(supplier.getLocator(additionalChain)).first();
     }
 
-    public Element getFirstElement(String additionalChain) {
+    public Jerry getFirstElement(String additionalChain) {
         return getFirstElement(BookHolder.getBook(), additionalChain);
     }
 
-    public Element getFirstElement(Document document, String additionalChain) {
-        return document.select(getLocator(additionalChain)).first();
+    public Jerry getFirstElement(Jerry document, String additionalChain) {
+        return document.find(getLocator(additionalChain)).first();
     }
 
 }

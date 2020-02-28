@@ -1,22 +1,17 @@
 package ru.chsergeig.fb2reader.mapping.documentinfo;
 
-import javafx.scene.Node;
-import org.jsoup.select.Elements;
-import ru.chsergeig.fb2reader.util.TextUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import jodd.jerry.Jerry;
 
 public class History {
 
-    private List<Node> texts = new ArrayList<>();
+    private String text;
 
-    public History(Elements elements) {
-        elements.stream().map(TextUtils::toTexts).forEach(texts::addAll);
+    public History(Jerry element) {
+        text = element.text();
     }
 
-    public List<Node> getTexts() {
-        return texts;
+    public String getText() {
+        return text;
     }
 
 }

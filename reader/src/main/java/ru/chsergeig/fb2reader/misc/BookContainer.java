@@ -2,7 +2,7 @@ package ru.chsergeig.fb2reader.misc;
 
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import org.jsoup.nodes.Element;
+import jodd.jerry.Jerry;
 import ru.chsergeig.fb2reader.BookHolder;
 
 import java.util.Collections;
@@ -12,43 +12,43 @@ import java.util.List;
 public class BookContainer {
 
     private final BookContainer parent;
-    private final Element element;
+    private final Jerry element;
     private final List<BookContainer> children = new LinkedList<>();
     private final List<javafx.scene.Node> content = new LinkedList<>();
     private String title;
 
 
-    public BookContainer(Element root) {
+    public BookContainer(Jerry root) {
         this(null, root);
     }
 
-    private BookContainer(BookContainer parent, Element elementToContain) {
+    private BookContainer(BookContainer parent, Jerry elementToContain) {
         this.parent = parent;
         this.element = elementToContain;
         createContent();
-        elementToContain.children().stream()
-                .filter(node -> node.tagName().equals("section"))
-                .map(section -> new BookContainer(this, section))
-                .forEach(children::add);
+//        elementToContain.children().stream()
+//                .filter(node -> node.tagName().equals("section"))
+//                .map(section -> new BookContainer(this, section))
+//                .forEach(children::add);
     }
 
 
     private void createContent() {
-        Element titleNode = element.children().stream()
-                .filter(node -> node.tagName().equals("title"))
-                .findAny()
-                .orElse(null);
-        if (null != titleNode) {
-            title = titleNode.text();
-        } else {
-            title = "---------";
-        }
-        content.addAll(toTexts(titleNode));
-        element.children().stream()
-                .filter(node -> node.tagName().equals("title"))
-                .findAny()
-                .orElse(null);
-        content.addAll(toTexts(element));
+//        Element titleNode = element.children().stream()
+//                .filter(node -> node.tagName().equals("title"))
+//                .findAny()
+//                .orElse(null);
+//        if (null != titleNode) {
+//            title = titleNode.text();
+//        } else {
+//            title = "---------";
+//        }
+//        content.addAll(toTexts(titleNode));
+//        element.children().stream()
+//                .filter(node -> node.tagName().equals("title"))
+//                .findAny()
+//                .orElse(null);
+//        content.addAll(toTexts(element));
     }
 
     public List<BookContainer> getChildren() {
@@ -63,7 +63,7 @@ public class BookContainer {
         return title;
     }
 
-    private List<javafx.scene.Node> toTexts(Element element) {
+    private List<javafx.scene.Node> toTexts(Jerry element) {
         if (null == element) {
             return Collections.emptyList();
         }

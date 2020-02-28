@@ -62,7 +62,7 @@ public class MainWindowController {
         if (null == file) {
             return;
         }
-        BookHolder.setBook(file);
+        BookHolder.setBook(file.toPath());
         showInfoDialog();
         fillTree();
         showCover();
@@ -150,7 +150,7 @@ public class MainWindowController {
             Text title = new Text(book.getBookTitle());
             title.setFont(Font.font("Helvetica", FontWeight.BOLD, BookHolder.fontSize * 2));
             nodes.add(title);
-            nodes.addAll(book.getMyHeader().getTexts());
+//            nodes.addAll(book.getMyHeader().getTexts());
             try {
                 ImageView image = new ImageView();
                 byte[] bytes = new BASE64Decoder().decodeBuffer(book.getCoverpage().getValue());
@@ -158,7 +158,7 @@ public class MainWindowController {
                 nodes.add(image);
             } catch (IOException ignore) {
             }
-            nodes.addAll(book.getMyFooter().getTexts());
+//            nodes.addAll(book.getMyFooter().getTexts());
         });
     }
 

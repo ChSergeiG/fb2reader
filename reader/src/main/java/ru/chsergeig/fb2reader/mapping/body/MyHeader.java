@@ -1,21 +1,17 @@
 package ru.chsergeig.fb2reader.mapping.body;
 
-import javafx.scene.Node;
-import org.jsoup.nodes.Element;
-import ru.chsergeig.fb2reader.util.TextUtils;
-
-import java.util.List;
+import jodd.jerry.Jerry;
 
 public class MyHeader {
 
-    private List<Node> texts;
+    private String text;
 
-    public MyHeader(Element element) {
-        texts = TextUtils.toTexts(element);
+    public MyHeader(Jerry element) {
+        text = element.text();
     }
 
-    public List<Node> getTexts() {
-        return texts;
+    public String getTexts() {
+        return text;
     }
 
 }

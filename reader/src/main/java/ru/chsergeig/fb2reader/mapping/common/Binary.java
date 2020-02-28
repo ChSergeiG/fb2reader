@@ -1,6 +1,6 @@
 package ru.chsergeig.fb2reader.mapping.common;
 
-import org.jsoup.nodes.Element;
+import jodd.jerry.Jerry;
 
 public class Binary {
 
@@ -8,10 +8,7 @@ public class Binary {
     private String id;
     private String type;
 
-    public Binary(Element element) {
-        if (!element.tagName().equals("binary")) {
-            return;
-        }
+    public Binary(Jerry element) {
         this.value = element.text().replaceAll("\\s*", "");
         this.id = element.attr("id");
         this.type = element.attr("content-type");

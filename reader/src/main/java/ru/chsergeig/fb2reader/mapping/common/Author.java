@@ -1,6 +1,6 @@
 package ru.chsergeig.fb2reader.mapping.common;
 
-import org.jsoup.nodes.Element;
+import jodd.jerry.Jerry;
 
 import static ru.chsergeig.fb2reader.util.TextUtils.safeExtractValue;
 
@@ -12,11 +12,11 @@ public class Author {
 
     private String toString = null;
 
-    public Author(Element element) {
-        firstName = safeExtractValue(() -> element.getElementsByTag("first-name").first().text());
-        lastName = safeExtractValue(() -> element.getElementsByTag("last-name").first().text());
-        nickName = safeExtractValue(() -> element.getElementsByTag("nickname").first().text());
-        email = safeExtractValue(() -> element.getElementsByTag("email").first().text());
+    public Author(Jerry element) {
+        firstName = safeExtractValue(() -> element.find("first-name").text(), "");
+        lastName = safeExtractValue(() -> element.find("last-name").text(), "");
+        nickName = safeExtractValue(() -> element.find("nickname").text(), "");
+        email = safeExtractValue(() -> element.find("email").text(), "");
     }
 
     public String getFirstName() {

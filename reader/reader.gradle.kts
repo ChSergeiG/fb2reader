@@ -8,7 +8,11 @@ application {
 }
 
 dependencies {
-    implementation("org.jsoup:jsoup:1.12.2")
+    implementation("org.jodd:jodd-core:5.1.3")
+    implementation("org.jodd:jodd-lagarto:5.1.3")
+
+
+//    implementation("org.jsoup:jsoup:1.12.2")
 }
 
 tasks.jar {
