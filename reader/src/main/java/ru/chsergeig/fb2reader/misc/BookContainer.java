@@ -8,6 +8,9 @@ import ru.chsergeig.fb2reader.BookHolder;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.StreamSupport;
+
+import static ru.chsergeig.fb2reader.util.TextUtils.safeExtractValue;
 
 public class BookContainer {
 
@@ -26,24 +29,21 @@ public class BookContainer {
         this.parent = parent;
         this.element = elementToContain;
         createContent();
-//        elementToContain.children().stream()
-//                .filter(node -> node.tagName().equals("section"))
-//                .map(section -> new BookContainer(this, section))
-//                .forEach(children::add);
+        StreamSupport
+                .stream(element.children().spliterator(), false)
+                .filter(node -> node.get(0).getNodeName().equals("section"))
+                .forEach(node -> children.add(new BookContainer(this, node)));
     }
 
 
     private void createContent() {
-//        Element titleNode = element.children().stream()
-//                .filter(node -> node.tagName().equals("title"))
-//                .findAny()
-//                .orElse(null);
-//        if (null != titleNode) {
-//            title = titleNode.text();
-//        } else {
-//            title = "---------";
-//        }
-//        content.addAll(toTexts(titleNode));
+        title = safeExtractValue(() -> StreamSupport.stream(element.children().spliterator(), false)
+                .filter(node -> node.get(0).getNodeName().equals("title"))
+                .findFirst()
+                .get()
+                .text(), "---------");
+
+        content.addAll(toText(title));
 //        element.children().stream()
 //                .filter(node -> node.tagName().equals("title"))
 //                .findAny()
@@ -71,6 +71,12 @@ public class BookContainer {
         text.setFont(Font.font("Consolas", BookHolder.fontSize));
         return Collections.singletonList(text);
 
+    }
+
+    private List<javafx.scene.Node> toText(String element) {
+        Text text = new Text(element);
+        text.setFont(Font.font("Consolas", BookHolder.fontSize));
+        return Collections.singletonList(text);
     }
 
 }

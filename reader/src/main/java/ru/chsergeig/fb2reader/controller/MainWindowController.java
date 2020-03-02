@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -22,11 +23,11 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import jodd.util.Base64;
 import ru.chsergeig.fb2reader.BookHolder;
 import ru.chsergeig.fb2reader.Xmain;
 import ru.chsergeig.fb2reader.mapping.FictionBook;
 import ru.chsergeig.fb2reader.misc.BookContainer;
-import sun.misc.BASE64Decoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -34,6 +35,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static ru.chsergeig.fb2reader.util.InCaseOfFail.THROW_EXCEPTION;
+import static ru.chsergeig.fb2reader.util.Utils.safeExecute;
 
 
 public class MainWindowController {
@@ -46,6 +50,8 @@ public class MainWindowController {
     protected TextFlow main;
     @FXML
     protected TreeView<BookContainer> tree;
+    @FXML
+    protected Button hideTree;
 
     @FXML
     protected void handleSelectFilePressed(ActionEvent event) {
@@ -91,6 +97,25 @@ public class MainWindowController {
         updateFontSizeTo(fictionBook.getRootContainer(), BookHolder.fontSize + 2);
     }
 
+    @FXML
+    public void handleHideTreeClick(ActionEvent actionEvent) {
+        String text = hideTree.getText();
+        Platform.runLater(() -> {
+            switch (text) {
+                case ">>>":
+                    tree.setVisible(false);
+                    hideTree.setText("<<<");
+                    break;
+                case "<<<":
+                    tree.setVisible(true);
+                    hideTree.setText(">>>");
+                    break;
+            }
+        });
+
+
+    }
+
     public void initialize() {
         tree.setCellFactory(tree -> {
             TreeCell<BookContainer> cell = new TreeCell<BookContainer>() {
@@ -116,14 +141,10 @@ public class MainWindowController {
                     }
                 }
             });
-            Platform.runLater(() -> {
-                cell.prefWidthProperty().bind(tree.widthProperty().subtract(5.0));
-            });
+            Platform.runLater(() -> cell.prefWidthProperty().bind(tree.widthProperty().subtract(5.0)));
             return cell;
         });
-        Platform.runLater(() -> {
-            main.prefWidthProperty().bind(main.getScene().widthProperty().multiply(0.8));
-        });
+        Platform.runLater(() -> main.prefWidthProperty().bind(main.getScene().widthProperty().multiply(0.95)));
     }
 
     private void showInfoDialog() {
@@ -151,13 +172,11 @@ public class MainWindowController {
             title.setFont(Font.font("Helvetica", FontWeight.BOLD, BookHolder.fontSize * 2));
             nodes.add(title);
 //            nodes.addAll(book.getMyHeader().getTexts());
-            try {
+            safeExecute(() -> {
                 ImageView image = new ImageView();
-                byte[] bytes = new BASE64Decoder().decodeBuffer(book.getCoverpage().getValue());
-                image.setImage(new Image(new ByteArrayInputStream(bytes)));
+                image.setImage(new Image(new ByteArrayInputStream(Base64.decode(book.getCoverpage().getValue()))));
                 nodes.add(image);
-            } catch (IOException ignore) {
-            }
+            }, THROW_EXCEPTION);
 //            nodes.addAll(book.getMyFooter().getTexts());
         });
     }

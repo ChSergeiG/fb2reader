@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
 <GridPane fx:id="gridPane" fx:controller="ru.chsergeig.fb2reader.controller.MainWindowController"
           xmlns:fx="http://javafx.com/fxml">
@@ -15,6 +24,7 @@
     <rowConstraints>
         <RowConstraints vgrow="SOMETIMES" minHeight="30.0"/>
         <RowConstraints vgrow="ALWAYS"/>
+        <RowConstraints vgrow="SOMETIMES" minHeight="30.0"/>
     </rowConstraints>
 
     <MenuBar fx:id="menubar" GridPane.columnIndex="0" GridPane.rowIndex="0">
@@ -33,7 +43,7 @@
         </buttons>
     </ButtonBar>
 
-    <ScrollPane GridPane.rowIndex="1" GridPane.columnIndex="0" hbarPolicy="NEVER">
+    <ScrollPane GridPane.rowIndex="1" GridPane.columnIndex="0" hbarPolicy="NEVER" GridPane.rowSpan="2">
         <VBox alignment="CENTER">
             <TextFlow fx:id="main">
                 <padding>
@@ -44,6 +54,7 @@
     </ScrollPane>
 
     <TreeView fx:id="tree" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <Button fx:id="hideTree" text=">>>" GridPane.rowIndex="2" GridPane.columnIndex="1" onAction="#handleHideTreeClick" prefWidth="Infinity"/>
 
 </GridPane>
 

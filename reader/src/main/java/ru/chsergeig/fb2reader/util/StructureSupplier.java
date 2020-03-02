@@ -12,7 +12,7 @@ public enum StructureSupplier {
     ANNOTATION("title-info > annotation > p"),
     KEYWORDS("title-info > keywords"),
     DATE("title-info > date"),
-    COVERPAGE("title-info > coverpage > img"),
+    COVERPAGE("title-info > coverpage > image"),
     LANG("title-info > lang"),
     SRC_LANG("title-info > src-lang"),
     TRANSLATOR("title-info > translator"),

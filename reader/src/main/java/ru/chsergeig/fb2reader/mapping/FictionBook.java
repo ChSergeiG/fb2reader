@@ -11,7 +11,6 @@ import ru.chsergeig.fb2reader.mapping.titleinfo.Sequence;
 import ru.chsergeig.fb2reader.misc.BookContainer;
 
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +20,7 @@ import java.util.Map;
 
 import static ru.chsergeig.fb2reader.util.StructureSupplier.ANNOTATION;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.BINARY;
+import static ru.chsergeig.fb2reader.util.StructureSupplier.BODY;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_AUTHOR;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_NAME;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_TITLE;
@@ -55,7 +55,7 @@ public class FictionBook {
     private String bookTitle = "";
     private Annotation annotation;
     private String keywords = "";
-    private LocalDate date = LocalDate.ofEpochDay(0);
+    private String date = "";
     private Binary coverpage;
     private String lang = "";
     private String srcLang = "";
@@ -63,7 +63,7 @@ public class FictionBook {
     private Sequence sequence;
     private Author fb2Author;
     private String programUsed = "";
-    private LocalDate fb2Date = LocalDate.ofEpochDay(0);
+    private String fb2Date = "";
     private URL fb2SrcUrl;
     private String fb2SrcOcr = "";
     private String fb2id = "";
@@ -113,7 +113,7 @@ public class FictionBook {
         bookTitle = safeExtractValue(() -> BOOK_TITLE.getFirstElement().text(), "");
         annotation = new Annotation(ANNOTATION.getFirstElement());
         keywords = safeExtractValue(() -> KEYWORDS.getFirstElement().text(), "");
-        date = safeExtractValue(() -> LocalDate.parse(DATE.getFirstElement().text()), LocalDate.ofEpochDay(0L));
+        date = safeExtractValue(() -> DATE.getFirstElement().text(), "");
         coverpage = binaries.get(safeExtractValue(() -> COVERPAGE.getFirstElement().attr("l:href")));
         lang = safeExtractValue(() -> LANG.getFirstElement().text(), "");
         srcLang = safeExtractValue(() -> SRC_LANG.getFirstElement().text(), "");
@@ -124,7 +124,7 @@ public class FictionBook {
     private void initDocumentInfo() {
         fb2Author = new Author(FB2_AUTHOR.getFirstElement());
         programUsed = safeExtractValue(() -> FB2_PROGRAM_USED.getFirstElement().text(), "");
-        fb2Date = safeExtractValue(() -> LocalDate.parse(FB2_DATE.getFirstElement().attr("value")), LocalDate.ofEpochDay(0L));
+        fb2Date = safeExtractValue(() -> FB2_DATE.getFirstElement().attr("value"), "");
         fb2SrcUrl = safeExtractValue(URL.class, null, () -> FB2_SRC_URL.getFirstElement().text());
         fb2SrcOcr = safeExtractValue(() -> FB2_SRC_OCR.getFirstElement().text(), "");
         fb2id = safeExtractValue(() -> FB2_ID.getFirstElement().text(), "");
@@ -144,7 +144,7 @@ public class FictionBook {
     }
 
     private void initBookContainers() {
-        rootContainer = new BookContainer(FICTIONBOOK.getFirstElement());
+        rootContainer = new BookContainer(BODY.getFirstElement());
     }
 
     private void initMyFooter() {
@@ -172,7 +172,7 @@ public class FictionBook {
         return keywords;
     }
 
-    public LocalDate getDate() {
+    public String getDate() {
         return date;
     }
 
@@ -204,7 +204,7 @@ public class FictionBook {
         return programUsed;
     }
 
-    public LocalDate getFb2Date() {
+    public String getFb2Date() {
         return fb2Date;
     }
 
