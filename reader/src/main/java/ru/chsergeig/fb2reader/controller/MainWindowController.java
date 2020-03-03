@@ -50,8 +50,6 @@ public class MainWindowController {
     protected TextFlow main;
     @FXML
     protected TreeView<BookContainer> tree;
-    @FXML
-    protected Button hideTree;
 
     @FXML
     protected void handleSelectFilePressed(ActionEvent event) {
@@ -69,7 +67,7 @@ public class MainWindowController {
             return;
         }
         BookHolder.setBook(file.toPath());
-        showInfoDialog();
+        handleShowInfoDialog();
         fillTree();
         showCover();
     }
@@ -98,22 +96,17 @@ public class MainWindowController {
     }
 
     @FXML
-    public void handleHideTreeClick(ActionEvent actionEvent) {
-        String text = hideTree.getText();
-        Platform.runLater(() -> {
-            switch (text) {
-                case ">>>":
-                    tree.setVisible(false);
-                    hideTree.setText("<<<");
-                    break;
-                case "<<<":
-                    tree.setVisible(true);
-                    hideTree.setText(">>>");
-                    break;
-            }
-        });
-
-
+    public void handleShowInfoDialog() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Xmain.class.getClassLoader().getResource("info_alert.fxml"));
+            Parent parent = fxmlLoader.load();
+            Scene scene = new Scene(parent);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException ignore) {
+        }
     }
 
     public void initialize() {
@@ -145,19 +138,6 @@ public class MainWindowController {
             return cell;
         });
         Platform.runLater(() -> main.prefWidthProperty().bind(main.getScene().widthProperty().multiply(0.95)));
-    }
-
-    private void showInfoDialog() {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Xmain.class.getClassLoader().getResource("info_alert.fxml"));
-            Parent parent = fxmlLoader.load();
-            Scene scene = new Scene(parent);
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException ignore) {
-        }
     }
 
     private void updateFontSizeTo(BookContainer container, double size) {

@@ -27,7 +27,8 @@ public class TextUtils {
 
     public static <T> T safeExtractValue(Supplier<T> supplier, T defaultValue) {
         try {
-            return supplier.get();
+            T t = supplier.get();
+            return null != t ? t : defaultValue;
         } catch (Exception ignore) {
             return defaultValue;
         }

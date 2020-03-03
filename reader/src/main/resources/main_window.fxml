@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
@@ -13,50 +14,58 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
-<GridPane fx:id="gridPane" fx:controller="ru.chsergeig.fb2reader.controller.MainWindowController"
-          xmlns:fx="http://javafx.com/fxml">
+<VBox xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ru.chsergeig.fb2reader.controller.MainWindowController">
+    <children>
 
-    <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="80.0" prefWidth="100.0"/>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0"/>
-    </columnConstraints>
+        <MenuBar fx:id="menubar" prefHeight="20.0">
+            <Menu text="System">
+                <MenuItem onAction="#handleExitButton" text="Exit"/>
+            </Menu>
+            <Menu text="Book">
+                <MenuItem onAction="#handleSelectFilePressed" text="Select file"/>
+                <MenuItem onAction="#handleShowInfoDialog" text="Show info"/>
+            </Menu>
+        </MenuBar>
+        <GridPane fx:id="gridPane" VBox.vgrow="ALWAYS">
 
-    <rowConstraints>
-        <RowConstraints vgrow="SOMETIMES" minHeight="30.0"/>
-        <RowConstraints vgrow="ALWAYS"/>
-        <RowConstraints vgrow="SOMETIMES" minHeight="30.0"/>
-    </rowConstraints>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="80.0" prefWidth="100.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0"/>
+            </columnConstraints>
 
-    <MenuBar fx:id="menubar" GridPane.columnIndex="0" GridPane.rowIndex="0">
-        <Menu text="System">
-            <MenuItem text="Exit" onAction="#handleExitButton"/>
-        </Menu>
-        <Menu text="Book">
-            <MenuItem text="Select file" onAction="#handleSelectFilePressed"/>
-        </Menu>
-    </MenuBar>
+            <rowConstraints>
+                <RowConstraints minHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints vgrow="ALWAYS"/>
+            </rowConstraints>
 
-    <ButtonBar GridPane.columnIndex="1" GridPane.rowIndex="0">
-        <buttons>
-            <Button text="F-" onAction="#handleFontDecrease"/>
-            <Button text="F+" onAction="#handleFontIncrease"/>
-        </buttons>
-    </ButtonBar>
-
-    <ScrollPane GridPane.rowIndex="1" GridPane.columnIndex="0" hbarPolicy="NEVER" GridPane.rowSpan="2">
-        <VBox alignment="CENTER">
-            <TextFlow fx:id="main">
+            <ButtonBar buttonMinWidth="20.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <buttons>
+                    <Button minHeight="20.0" minWidth="20.0" onAction="#handleFontDecrease" prefHeight="20.0"
+                            prefWidth="20.0" text="-" textAlignment="CENTER" wrapText="true"/>
+                    <Button minHeight="20.0" minWidth="20.0" onAction="#handleFontIncrease" prefHeight="20.0"
+                            prefWidth="20.0" text="+" textAlignment="CENTER" wrapText="true"/>
+                </buttons>
                 <padding>
-                    <Insets bottom="20.0" left="50.0" right="20.0" top="20.0"/>
+                    <Insets left="5.0" right="5.0"/>
                 </padding>
-            </TextFlow>
-        </VBox>
-    </ScrollPane>
+            </ButtonBar>
 
-    <TreeView fx:id="tree" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-    <Button fx:id="hideTree" text=">>>" GridPane.rowIndex="2" GridPane.columnIndex="1" onAction="#handleHideTreeClick" prefWidth="Infinity"/>
+            <ScrollPane hbarPolicy="NEVER" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <VBox alignment="CENTER">
+                    <TextFlow fx:id="main">
+                        <padding>
+                            <Insets bottom="20.0" left="50.0" right="20.0" top="20.0"/>
+                        </padding>
+                    </TextFlow>
+                </VBox>
+                <GridPane.margin>
+                    <Insets left="5.0" right="5.0"/>
+                </GridPane.margin>
+            </ScrollPane>
 
-</GridPane>
+            <TreeView fx:id="tree" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-
-
+        </GridPane>
+    </children>
+</VBox>
