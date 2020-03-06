@@ -1,4 +1,4 @@
-package ru.chsergeig.fb2reader.mapping.documentinfo;
+package ru.chsergeig.fb2reader.mapping.fictionbook.documentinfo;
 
 import jodd.jerry.Jerry;
 

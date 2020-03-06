@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import static ru.chsergeig.fb2reader.util.TextUtils.safeExtractValue;
+import static ru.chsergeig.fb2reader.util.Utils.safeExtractValue;
 
 public class BookContainer {
 

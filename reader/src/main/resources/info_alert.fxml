@@ -7,11 +7,12 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/10.0.2-internal"
             fx:controller="ru.chsergeig.fb2reader.controller.InfoAlertController">
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
     </padding>
-    <TableView fx:id="tableView" editable="true" mouseTransparent="true" AnchorPane.bottomAnchor="50.0"
+    <TableView fx:id="tableView" AnchorPane.bottomAnchor="50.0"
                AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
         <columns>
             <TableColumn prefWidth="300.0">

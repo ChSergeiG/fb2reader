@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -26,13 +25,16 @@ import javafx.stage.Stage;
 import jodd.util.Base64;
 import ru.chsergeig.fb2reader.BookHolder;
 import ru.chsergeig.fb2reader.Xmain;
-import ru.chsergeig.fb2reader.mapping.FictionBook;
+import ru.chsergeig.fb2reader.mapping.fictionbook.FictionBook;
 import ru.chsergeig.fb2reader.misc.BookContainer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +55,7 @@ public class MainWindowController {
 
     @FXML
     protected void handleSelectFilePressed(ActionEvent event) {
+        checkLastLoadedFile();
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FictionBook", "*.fb2"));
         File ff = null;
@@ -66,10 +69,30 @@ public class MainWindowController {
         if (null == file) {
             return;
         }
+
+
         BookHolder.setBook(file.toPath());
         handleShowInfoDialog();
         fillTree();
         showCover();
+    }
+
+    private void checkLastLoadedFile() {
+        String tempDir = System.getProperty("java.io.tmpdir");
+        Path cachePath = Paths.get(System.getProperty("java.io.tmpdir"), "fb2reader_cache.xml");
+        if (!Files.exists(cachePath)) {
+            try {
+                Path tempFile = Files.createFile(cachePath);
+                XmlMapper
+
+
+
+
+            } catch (IOException e) {
+                throw new RuntimeException("Cant create temp file");
+            }
+        }
+
     }
 
     @FXML

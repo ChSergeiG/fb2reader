@@ -8,6 +8,10 @@ application {
 }
 
 dependencies {
+
+    implementation("com.fasterxml.jackson.core:jackson-dataformat-xml:2.10.3")
+
+
     implementation("org.jodd:jodd-core:5.1.3")
     implementation("org.jodd:jodd-lagarto:5.1.3")
 

@@ -1,13 +1,13 @@
-package ru.chsergeig.fb2reader.mapping;
+package ru.chsergeig.fb2reader.mapping.fictionbook;
 
 import jodd.jerry.Jerry;
-import ru.chsergeig.fb2reader.mapping.body.MyFooter;
-import ru.chsergeig.fb2reader.mapping.body.MyHeader;
-import ru.chsergeig.fb2reader.mapping.common.Author;
-import ru.chsergeig.fb2reader.mapping.common.Binary;
-import ru.chsergeig.fb2reader.mapping.documentinfo.History;
-import ru.chsergeig.fb2reader.mapping.titleinfo.Annotation;
-import ru.chsergeig.fb2reader.mapping.titleinfo.Sequence;
+import ru.chsergeig.fb2reader.mapping.fictionbook.body.MyFooter;
+import ru.chsergeig.fb2reader.mapping.fictionbook.body.MyHeader;
+import ru.chsergeig.fb2reader.mapping.fictionbook.common.Author;
+import ru.chsergeig.fb2reader.mapping.fictionbook.common.Binary;
+import ru.chsergeig.fb2reader.mapping.fictionbook.documentinfo.History;
+import ru.chsergeig.fb2reader.mapping.fictionbook.titleinfo.Annotation;
+import ru.chsergeig.fb2reader.mapping.fictionbook.titleinfo.Sequence;
 import ru.chsergeig.fb2reader.misc.BookContainer;
 
 import java.net.URL;
@@ -35,7 +35,6 @@ import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_PROGRAM_USED;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_SRC_OCR;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_SRC_URL;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_VERSION;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FICTIONBOOK;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.GENRE;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.ISBN;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.KEYWORDS;
@@ -46,7 +45,7 @@ import static ru.chsergeig.fb2reader.util.StructureSupplier.PUBLISHER;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.SEQUENCE;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.SRC_LANG;
 import static ru.chsergeig.fb2reader.util.StructureSupplier.TRANSLATOR;
-import static ru.chsergeig.fb2reader.util.TextUtils.safeExtractValue;
+import static ru.chsergeig.fb2reader.util.Utils.safeExtractValue;
 
 public class FictionBook {
 

@@ -1,17 +1,15 @@
-package ru.chsergeig.fb2reader.mapping.body;
+package ru.chsergeig.fb2reader.mapping.fictionbook.body;
 
 import jodd.jerry.Jerry;
 
-public class MyHeader {
-
+public class MyFooter {
     private String text;
 
-    public MyHeader(Jerry element) {
+    public MyFooter(Jerry element) {
         text = element.text();
     }
 
     public String getTexts() {
         return text;
     }
-
 }

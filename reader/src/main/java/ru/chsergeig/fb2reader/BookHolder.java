@@ -3,8 +3,8 @@ package ru.chsergeig.fb2reader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import jodd.jerry.Jerry;
-import ru.chsergeig.fb2reader.mapping.FictionBook;
-import ru.chsergeig.fb2reader.mapping.common.Author;
+import ru.chsergeig.fb2reader.mapping.fictionbook.FictionBook;
+import ru.chsergeig.fb2reader.mapping.fictionbook.common.Author;
 import ru.chsergeig.fb2reader.misc.BookInfoTableRow;
 import ru.chsergeig.fb2reader.util.TextUtils;
 
@@ -13,10 +13,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Spliterator;
 import java.util.stream.Collectors;
 
 public class BookHolder {

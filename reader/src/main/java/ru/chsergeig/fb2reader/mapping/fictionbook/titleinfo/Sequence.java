@@ -1,8 +1,8 @@
-package ru.chsergeig.fb2reader.mapping.titleinfo;
+package ru.chsergeig.fb2reader.mapping.fictionbook.titleinfo;
 
 import jodd.jerry.Jerry;
 
-import static ru.chsergeig.fb2reader.util.TextUtils.safeExtractValue;
+import static ru.chsergeig.fb2reader.util.Utils.safeExtractValue;
 
 public class Sequence {
 
