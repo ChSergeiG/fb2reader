@@ -1,8 +1,7 @@
 package ru.chsergeig.fb2reader.mapping.fictionbook;
 
 import jodd.jerry.Jerry;
-import ru.chsergeig.fb2reader.mapping.fictionbook.body.MyFooter;
-import ru.chsergeig.fb2reader.mapping.fictionbook.body.MyHeader;
+import ru.chsergeig.fb2reader.mapping.fictionbook.body.MyHeaderFooter;
 import ru.chsergeig.fb2reader.mapping.fictionbook.common.Author;
 import ru.chsergeig.fb2reader.mapping.fictionbook.common.Binary;
 import ru.chsergeig.fb2reader.mapping.fictionbook.documentinfo.History;
@@ -18,34 +17,34 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static ru.chsergeig.fb2reader.util.StructureSupplier.ANNOTATION;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.BINARY;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.BODY;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_AUTHOR;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_NAME;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.BOOK_TITLE;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.CITY;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.COVERPAGE;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.DATE;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_AUTHOR;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_DATE;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_HISTORY;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_ID;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_PROGRAM_USED;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_SRC_OCR;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_SRC_URL;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.FB2_VERSION;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.GENRE;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.ISBN;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.KEYWORDS;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.LANG;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.MY_FOOTER;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.MY_HEADER;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.PUBLISHER;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.SEQUENCE;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.SRC_LANG;
-import static ru.chsergeig.fb2reader.util.StructureSupplier.TRANSLATOR;
 import static ru.chsergeig.fb2reader.util.Utils.safeExtractValue;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.ANNOTATION;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.BINARY;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.BODY;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.BOOK_AUTHOR;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.BOOK_NAME;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.BOOK_TITLE;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.CITY;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.COVERPAGE;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.DATE;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.FB2_AUTHOR;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.FB2_DATE;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.FB2_HISTORY;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.FB2_ID;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.FB2_PROGRAM_USED;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.FB2_SRC_OCR;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.FB2_SRC_URL;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.FB2_VERSION;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.GENRE;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.ISBN;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.KEYWORDS;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.LANG;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.MY_FOOTER;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.MY_HEADER;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.PUBLISHER;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.SEQUENCE;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.SRC_LANG;
+import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.TRANSLATOR;
 
 public class FictionBook {
 
@@ -72,9 +71,9 @@ public class FictionBook {
     private String publisher = "";
     private String city = "";
     private String isbn = "";
-    private MyHeader myHeader;
+    private MyHeaderFooter myHeader;
     private BookContainer rootContainer;
-    private MyFooter myFooter;
+    private MyHeaderFooter myFooter;
     private Map<String, Binary> binaries = new HashMap<>();
 
     public FictionBook() {
@@ -139,7 +138,7 @@ public class FictionBook {
     }
 
     private void initMyHeader() {
-        myHeader = new MyHeader(MY_HEADER.getFirstElement());
+        myHeader = new MyHeaderFooter(MY_HEADER.getFirstElement());
     }
 
     private void initBookContainers() {
@@ -147,7 +146,7 @@ public class FictionBook {
     }
 
     private void initMyFooter() {
-        myFooter = new MyFooter(MY_FOOTER.getFirstElement());
+        myFooter = new MyHeaderFooter(MY_FOOTER.getFirstElement());
     }
 
     // region getters
@@ -243,7 +242,7 @@ public class FictionBook {
         return isbn;
     }
 
-    public MyHeader getMyHeader() {
+    public MyHeaderFooter getMyHeader() {
         return myHeader;
     }
 
@@ -251,7 +250,7 @@ public class FictionBook {
         return rootContainer;
     }
 
-    public MyFooter getMyFooter() {
+    public MyHeaderFooter getMyFooter() {
         return myFooter;
     }
 

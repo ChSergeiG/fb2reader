@@ -10,6 +10,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import ru.chsergeig.fb2reader.util.CacheUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,16 +18,14 @@ import java.util.stream.Collectors;
 
 public class Xmain extends Application {
 
-    private Stage primaryStage;
-
     @Override
     public void start(Stage primaryStage) throws IOException {
-
-//        ImageIO.read(new ByteArrayInputStream(new BASE64Decoder().decodeBuffer(book.select("binary").first().text().replaceAll("\\s*", ""))));
-
-        this.primaryStage = primaryStage;
-
         Thread.setDefaultUncaughtExceptionHandler(this::showExceptionDialog);
+
+        CacheUtils.getBookCache();
+        CacheUtils.validateCache();
+        primaryStage.setOnCloseRequest((event) -> CacheUtils.writeCacheToFile());
+
         Parent root = FXMLLoader.load(Xmain.class.getClassLoader().getResource("main_window.fxml"));
         Scene scene = new Scene(root, 300, 300);
         scene.setFill(Color.WHITE);

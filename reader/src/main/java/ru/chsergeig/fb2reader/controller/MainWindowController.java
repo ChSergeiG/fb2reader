@@ -5,44 +5,40 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import jodd.util.Base64;
 import ru.chsergeig.fb2reader.BookHolder;
 import ru.chsergeig.fb2reader.Xmain;
+import ru.chsergeig.fb2reader.mapping.cache.BookCache;
 import ru.chsergeig.fb2reader.mapping.fictionbook.FictionBook;
 import ru.chsergeig.fb2reader.misc.BookContainer;
+import ru.chsergeig.fb2reader.util.CacheUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URL;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-
-import static ru.chsergeig.fb2reader.util.InCaseOfFail.THROW_EXCEPTION;
-import static ru.chsergeig.fb2reader.util.Utils.safeExecute;
+import java.util.ResourceBundle;
 
 
-public class MainWindowController {
+public class MainWindowController implements Initializable {
 
     @FXML
     protected MenuBar menubar;
@@ -52,52 +48,27 @@ public class MainWindowController {
     protected TextFlow main;
     @FXML
     protected TreeView<BookContainer> tree;
+    @FXML
+    protected Menu lastBooks;
 
     @FXML
     protected void handleSelectFilePressed(ActionEvent event) {
-        checkLastLoadedFile();
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FictionBook", "*.fb2"));
-        File ff = null;
-        try {
-            ff = new File(Xmain.class.getClassLoader().getResource("123.fb2").toURI());
-        } catch (URISyntaxException ignore) {
-        }
-        fileChooser.setInitialDirectory(ff.getParentFile());
-        fileChooser.setInitialFileName("123.fb2");
         File file = fileChooser.showOpenDialog(null);
         if (null == file) {
             return;
         }
-
-
+        CacheUtils.getBookCache().addEntry(file.toPath(), file.getAbsolutePath(), LocalDateTime.now());
         BookHolder.setBook(file.toPath());
-        handleShowInfoDialog();
         fillTree();
-        showCover();
-    }
-
-    private void checkLastLoadedFile() {
-        String tempDir = System.getProperty("java.io.tmpdir");
-        Path cachePath = Paths.get(System.getProperty("java.io.tmpdir"), "fb2reader_cache.xml");
-        if (!Files.exists(cachePath)) {
-            try {
-                Path tempFile = Files.createFile(cachePath);
-                XmlMapper
-
-
-
-
-            } catch (IOException e) {
-                throw new RuntimeException("Cant create temp file");
-            }
-        }
-
+        BookContainer.showCover(main);
     }
 
     @FXML
     protected void handleExitButton(ActionEvent event) {
-        System.exit(0);
+        CacheUtils.writeCacheToFile();
+        Platform.exit();
     }
 
     @FXML
@@ -132,7 +103,8 @@ public class MainWindowController {
         }
     }
 
-    public void initialize() {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         tree.setCellFactory(tree -> {
             TreeCell<BookContainer> cell = new TreeCell<BookContainer>() {
                 @Override
@@ -146,43 +118,55 @@ public class MainWindowController {
                 }
             };
             cell.setOnMouseClicked(event -> {
-                if (!cell.isEmpty()) {
-                    TreeItem<BookContainer> treeItem = cell.getTreeItem();
-                    if (treeItem.getChildren().size() == 0) {
-                        Platform.runLater(() -> {
-                            ObservableList<Node> nodes = main.getChildren();
-                            nodes.clear();
-                            nodes.addAll(cell.getItem().getContent());
-                        });
-                    }
+                TreeItem<BookContainer> treeItem = cell.getTreeItem();
+                if (null == cell.getItem().getParent()) {
+                    BookContainer.showCover(main);
+                    return;
+                }
+                if (treeItem.getChildren().size() == 0) {
+                    Platform.runLater(() -> {
+                        ObservableList<Node> nodes = main.getChildren();
+                        nodes.clear();
+                        nodes.addAll(cell.getItem().getContent());
+                    });
                 }
             });
             Platform.runLater(() -> cell.prefWidthProperty().bind(tree.widthProperty().subtract(5.0)));
             return cell;
         });
-        Platform.runLater(() -> main.prefWidthProperty().bind(main.getScene().widthProperty().multiply(0.95)));
+        Platform.runLater(() -> main.prefWidthProperty().bind(main.getScene().widthProperty().multiply(0.75)));
+
+        ObservableList<MenuItem> items = lastBooks.getItems();
+        items.clear();
+        BookCache bookCache = CacheUtils.getBookCache();
+        if (bookCache.books.isEmpty()) {
+            MenuItem menuItem = new MenuItem("(no books)");
+            menuItem.setDisable(true);
+            items.add(menuItem);
+            return;
+        }
+        bookCache.books.forEach(entry -> {
+            MenuItem item = new MenuItem(entry.bookTitle);
+            item.setOnAction(event -> {
+                BookHolder.setBook(Paths.get(entry.fileName));
+                fillTree();
+                BookContainer.showCover(main);
+            });
+            items.add(item);
+        });
+        bookCache.books.stream()
+                .sorted(Comparator.comparing(o -> o.lastLoadedDate))
+                .max(Comparator.naturalOrder())
+                .ifPresent(entry -> {
+                    BookHolder.setBook(Paths.get(entry.fileName));
+                    fillTree();
+                    BookContainer.showCover(main);
+                });
     }
 
     private void updateFontSizeTo(BookContainer container, double size) {
     }
 
-    private void showCover() {
-        Platform.runLater(() -> {
-            ObservableList<Node> nodes = main.getChildren();
-            FictionBook book = BookHolder.getFictionBook();
-            nodes.clear();
-            Text title = new Text(book.getBookTitle());
-            title.setFont(Font.font("Helvetica", FontWeight.BOLD, BookHolder.fontSize * 2));
-            nodes.add(title);
-//            nodes.addAll(book.getMyHeader().getTexts());
-            safeExecute(() -> {
-                ImageView image = new ImageView();
-                image.setImage(new Image(new ByteArrayInputStream(Base64.decode(book.getCoverpage().getValue()))));
-                nodes.add(image);
-            }, THROW_EXCEPTION);
-//            nodes.addAll(book.getMyFooter().getTexts());
-        });
-    }
 
     private void fillTree() {
         BookContainer rootContainer = BookHolder.getFictionBook().getRootContainer();

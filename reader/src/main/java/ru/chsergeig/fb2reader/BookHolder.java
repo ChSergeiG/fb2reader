@@ -6,22 +6,28 @@ import jodd.jerry.Jerry;
 import ru.chsergeig.fb2reader.mapping.fictionbook.FictionBook;
 import ru.chsergeig.fb2reader.mapping.fictionbook.common.Author;
 import ru.chsergeig.fb2reader.misc.BookInfoTableRow;
+import ru.chsergeig.fb2reader.util.CacheUtils;
 import ru.chsergeig.fb2reader.util.TextUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class BookHolder {
 
+    public static double fontSize = 15.0d;
     private static Jerry book;
     private static FictionBook fictionBook;
     private static String validCharset;
-    public static double fontSize = 15.0d;
+
+    public static Jerry getBook() {
+        return book;
+    }
 
     public static void setBook(Path file) {
         validCharset = TextUtils.getValidCharset(file);
@@ -31,10 +37,7 @@ public class BookHolder {
             throw new RuntimeException("Cant parse book", e);
         }
         mapBookToFb2();
-    }
-
-    public static Jerry getBook() {
-        return book;
+        CacheUtils.getBookCache().addEntry(file, fictionBook.getBookTitle(), LocalDateTime.now());
     }
 
     public static FictionBook getFictionBook() {

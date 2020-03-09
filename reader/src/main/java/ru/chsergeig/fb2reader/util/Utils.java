@@ -1,5 +1,7 @@
 package ru.chsergeig.fb2reader.util;
 
+import ru.chsergeig.fb2reader.util.enumeration.InCaseOfFail;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
@@ -10,10 +12,7 @@ public final class Utils {
     }
 
     public static void safeExecute(Runnable toExecute) {
-        try {
-            toExecute.run();
-        } catch (Throwable ignore) {
-        }
+       safeExecute(toExecute, InCaseOfFail.IGNORE);
     }
 
     public static void safeExecute(Runnable toExecute, InCaseOfFail inCaseOfFail) {
@@ -61,6 +60,5 @@ public final class Utils {
             return defaultValue;
         }
     }
-
 
 }

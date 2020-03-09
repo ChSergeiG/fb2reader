@@ -6,7 +6,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="450.0" prefWidth="650.0"
             xmlns="http://javafx.com/javafx/10.0.2-internal"
             fx:controller="ru.chsergeig.fb2reader.controller.InfoAlertController">
     <padding>
