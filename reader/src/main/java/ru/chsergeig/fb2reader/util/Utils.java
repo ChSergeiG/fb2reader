@@ -1,5 +1,8 @@
 package ru.chsergeig.fb2reader.util;
 
+import jodd.jerry.Jerry;
+import jodd.lagarto.dom.Attribute;
+import jodd.lagarto.dom.Node;
 import ru.chsergeig.fb2reader.util.enumeration.InCaseOfFail;
 
 import java.lang.reflect.Constructor;
@@ -12,7 +15,7 @@ public final class Utils {
     }
 
     public static void safeExecute(Runnable toExecute) {
-       safeExecute(toExecute, InCaseOfFail.IGNORE);
+        safeExecute(toExecute, InCaseOfFail.IGNORE);
     }
 
     public static void safeExecute(Runnable toExecute, InCaseOfFail inCaseOfFail) {
@@ -61,4 +64,29 @@ public final class Utils {
         }
     }
 
+    public static String getAttributeIgnoreNs(Jerry item, String postfix) {
+        return getAttributeIgnoreNs(item.get(0), postfix);
+
+    }
+
+    public static String getAttributeIgnoreNs(Node jerryNode, String postfix) {
+        String attribute = "";
+        int i = 0;
+        while (attribute != null) {
+            Attribute jerryNodeAttribute ;
+            try {
+                jerryNodeAttribute = jerryNode.getAttribute(i++);
+                if (null ==  jerryNodeAttribute) {
+                    return null;
+                }
+            } catch (NullPointerException ignore) {
+                return null;
+            }
+            attribute = jerryNodeAttribute.getName();
+            if (attribute.endsWith(postfix)) {
+                return jerryNodeAttribute.getValue();
+            }
+        }
+        return null;
+    }
 }

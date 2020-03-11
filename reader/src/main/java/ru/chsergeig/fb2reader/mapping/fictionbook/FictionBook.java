@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static ru.chsergeig.fb2reader.util.Utils.getAttributeIgnoreNs;
 import static ru.chsergeig.fb2reader.util.Utils.safeExtractValue;
 import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.ANNOTATION;
 import static ru.chsergeig.fb2reader.util.enumeration.StructureSupplier.BINARY;
@@ -112,7 +113,7 @@ public class FictionBook {
         annotation = new Annotation(ANNOTATION.getFirstElement());
         keywords = safeExtractValue(() -> KEYWORDS.getFirstElement().text(), "");
         date = safeExtractValue(() -> DATE.getFirstElement().text(), "");
-        coverpage = binaries.get(safeExtractValue(() -> COVERPAGE.getFirstElement().attr("l:href")));
+        coverpage = binaries.get(safeExtractValue(() -> getAttributeIgnoreNs(COVERPAGE.getFirstElement(), "href")));
         lang = safeExtractValue(() -> LANG.getFirstElement().text(), "");
         srcLang = safeExtractValue(() -> SRC_LANG.getFirstElement().text(), "");
         translator = new Author(TRANSLATOR.getFirstElement());

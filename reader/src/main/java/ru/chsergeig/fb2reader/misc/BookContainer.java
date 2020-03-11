@@ -23,7 +23,7 @@ import static ru.chsergeig.fb2reader.util.TextUtils.jerryToParagraphs;
 import static ru.chsergeig.fb2reader.util.TextUtils.jerryToString;
 import static ru.chsergeig.fb2reader.util.Utils.safeExecute;
 import static ru.chsergeig.fb2reader.util.Utils.safeExtractValue;
-import static ru.chsergeig.fb2reader.util.enumeration.InCaseOfFail.THROW_EXCEPTION;
+import static ru.chsergeig.fb2reader.util.enumeration.InCaseOfFail.IGNORE;
 
 public class BookContainer {
 
@@ -57,10 +57,10 @@ public class BookContainer {
                 titleContainer.setAlignment(TextAlignment.CENTER);
                 titleContainer.getChildren().add(title);
                 containers.add(titleContainer);
-            }, THROW_EXCEPTION);
+            }, IGNORE);
             safeExecute(() -> {
                 containers.addAll(book.getMyHeader().getTexts());
-            }, THROW_EXCEPTION);
+            }, IGNORE);
             safeExecute(() -> {
                 if (null != book.getCoverpage()) {
                     ImageView image = new ImageView();
@@ -80,10 +80,10 @@ public class BookContainer {
                     imgContainer.setAlignment(TextAlignment.CENTER);
                     containers.add(imgContainer);
                 }
-            }, THROW_EXCEPTION);
+            }, IGNORE);
             safeExecute(() -> {
                 containers.addAll(book.getMyFooter().getTexts());
-            }, THROW_EXCEPTION);
+            }, IGNORE);
             pane.showParagraphs(containers);
         });
     }
@@ -102,10 +102,16 @@ public class BookContainer {
 
     public String getTitle() {
         if (null == title) {
-            title = safeExtractValue(() -> jerryToString(StreamSupport.stream(element.children().spliterator(), false)
-                    .filter(node -> node.get(0).getNodeName().equals("title"))
-                    .findFirst()
-                    .get()), safeExtractValue(() -> element.get(0).getChildNodes()[0].getNodeName(), "------"));
+            String rawTitle = safeExtractValue(
+                    () -> jerryToString(
+                            StreamSupport.stream(element.children().spliterator(), false)
+                                    .filter(node -> node.get(0).getNodeName().equals("title"))
+                                    .findFirst()
+                                    .get()),
+                    safeExtractValue(
+                            () -> element.get(0).getChildNodes()[0].getNodeName(),
+                            "------"));
+            this.title = String.join(". ", rawTitle.trim().split("\\s*\n\\s*"));
         }
         return title;
     }

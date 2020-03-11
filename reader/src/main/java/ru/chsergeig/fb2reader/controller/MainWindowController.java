@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -36,7 +37,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
-
 public class MainWindowController implements Initializable {
 
     @FXML
@@ -48,12 +48,14 @@ public class MainWindowController implements Initializable {
     @FXML
     protected Menu lastBooks;
     @FXML
+    public ScrollPane scrollPane;
+    @FXML
     public MainFlowPane flowPane;
 
     @FXML
     protected void handleSelectFilePressed(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FictionBook", "*.fb2"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FictionBook", "*.fb2", "*.zip"));
         File file = fileChooser.showOpenDialog(null);
         if (null == file) {
             return;
@@ -125,6 +127,7 @@ public class MainWindowController implements Initializable {
                 if (treeItem.getChildren().size() == 0) {
                     Platform.runLater(() -> flowPane.showParagraphs(cell.getItem().getContent()));
                 }
+                scrollPane.vvalueProperty().set(0.0d);
             });
             Platform.runLater(() -> cell.prefWidthProperty().bind(tree.widthProperty().subtract(5.0)));
             return cell;

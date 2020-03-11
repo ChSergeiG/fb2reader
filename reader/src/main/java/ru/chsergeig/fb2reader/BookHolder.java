@@ -10,13 +10,19 @@ import ru.chsergeig.fb2reader.util.CacheUtils;
 import ru.chsergeig.fb2reader.util.TextUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class BookHolder {
 
@@ -29,15 +35,39 @@ public class BookHolder {
         return book;
     }
 
-    public static void setBook(Path file) {
-        validCharset = TextUtils.getValidCharset(file);
-        try {
-            book = Jerry.jerry(String.join("\n", Files.readAllLines(file, Charset.forName(validCharset))));
-        } catch (IOException e) {
-            throw new RuntimeException("Cant parse book", e);
+    public static void setBook(Path pathFile) {
+        if (pathFile.toString().toLowerCase().endsWith(".fb2")) {
+            validCharset = TextUtils.getValidCharset(pathFile);
+            try {
+                book = Jerry.jerry(String.join("\n", Files.readAllLines(pathFile, Charset.forName(validCharset))));
+            } catch (IOException e) {
+                throw new RuntimeException("Cant parse book", e);
+            }
+        }
+        if (pathFile.toString().toLowerCase().endsWith(".zip")) {
+            Path extractedPath = null;
+            try {
+                ZipFile zipFile = new ZipFile(pathFile.toFile());
+                Optional<? extends ZipEntry> zipEntry = zipFile.stream()
+                        .filter(entry -> entry.getName().toLowerCase().endsWith(".fb2"))
+                        .findFirst();
+                if (zipEntry.isPresent()) {
+                    InputStream fileInputStream = zipFile.getInputStream(zipEntry.get());
+                    extractedPath = Paths.get(System.getProperty("java.io.tmpdir"), "fb2r_" + UUID.randomUUID().toString() + ".fb2");
+                    Files.copy(fileInputStream, extractedPath);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Cant load zip file", e);
+            }
+            validCharset = TextUtils.getValidCharset(extractedPath);
+            try {
+                book = Jerry.jerry(String.join("\n", Files.readAllLines(extractedPath, Charset.forName(validCharset))));
+            } catch (IOException e) {
+                throw new RuntimeException("Cant parse book", e);
+            }
         }
         mapBookToFb2();
-        CacheUtils.getBookCache().addEntry(file, fictionBook.getBookTitle(), LocalDateTime.now());
+        CacheUtils.getBookCache().addEntry(pathFile, fictionBook.getBookTitle(), LocalDateTime.now());
     }
 
     public static FictionBook getFictionBook() {

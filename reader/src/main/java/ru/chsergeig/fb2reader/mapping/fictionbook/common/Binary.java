@@ -10,7 +10,7 @@ public class Binary {
 
     public Binary(Jerry element) {
         this.value = element.text().replaceAll("\\s*", "");
-        this.id = element.attr("id");
+        this.id =  element.attr("id");
         this.type = element.attr("content-type");
     }
 
