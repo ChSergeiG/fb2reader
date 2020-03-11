@@ -5,9 +5,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import jodd.jerry.Jerry;
 import jodd.util.Base64;
 import ru.chsergeig.fb2reader.BookHolder;
+import ru.chsergeig.fb2reader.elements.TextFlowContainer;
 import ru.chsergeig.fb2reader.util.enumeration.TextFontProvider;
 import ru.chsergeig.fb2reader.util.enumeration.TextModifiers;
 
@@ -56,9 +58,9 @@ public class TextUtils {
         throw new RuntimeException("Cant determine charset");
     }
 
-    public static List<javafx.scene.Node> jerryToTexts(Jerry jerry) {
-        List<javafx.scene.Node> result = new LinkedList<>();
-        jerryToTexts(jerry.get(0), result, new Stack<>());
+    public static List<TextFlowContainer> jerryToParagraphs(Jerry jerry) {
+        List<TextFlowContainer> result = new LinkedList<>();
+        jerryToParagraphs(jerry.get(0), result, new Stack<>());
         return result;
     }
 
@@ -71,67 +73,75 @@ public class TextUtils {
                 .replaceAll("</?[\\w\\d=\":\\-\\s]*/?>", "");
     }
 
-    public static void addEmptyLine(List<javafx.scene.Node> appends) {
-        Text text = new Text("\n");
-        text.setFont(TextFontProvider.NORMAL.getFont());
-        appends.add(text);
-    }
-
     // region privates
 
-    private static void jerryToTexts(jodd.lagarto.dom.Node jerryNode, List<javafx.scene.Node> appends, Stack<TextModifiers> modifiers) {
-        if (null == jerryNode || jerryNode.getChildNodes().length == 0) {
-            javafx.scene.Node fxNode = createElement(jerryNode, modifiers);
-            if (null != fxNode) {
-                if ("image".equals(jerryNode.getNodeName())) {
-                    addEmptyLine(appends);
-                    appends.add(fxNode);
-                    addEmptyLine(appends);
-                } else {
-                    appends.add(fxNode);
-                }
-            }
-            return;
-        }
-        jodd.lagarto.dom.Node[] childNodes = jerryNode.getChildNodes();
+    private static void jerryToParagraphs(jodd.lagarto.dom.Node jerryNode, List<TextFlowContainer> containers, Stack<TextModifiers> modifiers) {
+        TextFlowContainer container = null;
         switch (jerryNode.getNodeName()) {
             case "title":
                 modifiers.push(TextModifiers.TITLE);
+                container = new TextFlowContainer();
+                container.setAlignment(TextAlignment.CENTER);
                 break;
             case "subtitle":
                 modifiers.push(TextModifiers.SUBTITLE);
+                container = new TextFlowContainer().addTab();
                 break;
             case "p":
                 modifiers.push(TextModifiers.P);
-                addEmptyLine(appends);
-                break;
-            case "empty-line":
-                modifiers.push(TextModifiers.EMPTY_LINE);
-                addEmptyLine(appends);
-                break;
-            case "a":
-                modifiers.push(TextModifiers.LINK);
-                break;
-            case "strong":
-                modifiers.push(TextModifiers.BOLD);
+                container = new TextFlowContainer().addTab();
                 break;
             case "epigraph":
                 modifiers.push(TextModifiers.CITE);
-                addEmptyLine(appends);
                 break;
             case "text-author":
                 modifiers.push(TextModifiers.ITALIC);
-                addEmptyLine(appends);
+                container = new TextFlowContainer().addTab();
+                break;
+            case "img":
+                modifiers.push(TextModifiers.NONE);
+                container = new TextFlowContainer();
+                container.setAlignment(TextAlignment.CENTER);
                 break;
             default:
                 modifiers.push(TextModifiers.NONE);
         }
-        for (jodd.lagarto.dom.Node childNode : childNodes) {
-            jerryToTexts(childNode, appends, modifiers);
+        if (null == container) {
+            for (jodd.lagarto.dom.Node childNode : jerryNode.getChildNodes()) {
+                jerryToParagraphs(childNode, containers, modifiers);
+            }
+        } else {
+            jerryAsParagraph(jerryNode, container, modifiers);
+            containers.add(container);
         }
         modifiers.pop();
     }
 
+    private static void jerryAsParagraph(jodd.lagarto.dom.Node jerryNode, TextFlowContainer container, Stack<TextModifiers> modifiers) {
+        if (jerryNode instanceof jodd.lagarto.dom.Text) {
+            container.getChildren().add(createElement(jerryNode, modifiers));
+        } else {
+            switch (jerryNode.getNodeName()) {
+                case "empty-line":
+                    Text text = new Text("\n");
+                    text.setFont(TextFontProvider.of(modifiers).getFont());
+                    container.getChildren().add(text);
+                    return;
+                case "a":
+                    modifiers.push(TextModifiers.LINK);
+                    break;
+                case "strong":
+                    modifiers.push(TextModifiers.BOLD);
+                    break;
+                default:
+                    modifiers.push(TextModifiers.NONE);
+            }
+            for (jodd.lagarto.dom.Node childNode : jerryNode.getChildNodes()) {
+                jerryAsParagraph(childNode, container, modifiers);
+            }
+            modifiers.pop();
+        }
+    }
 
     private static void jerryToString(jodd.lagarto.dom.Node jerryNode, List<String> appends) {
         if (null == jerryNode) {
@@ -147,12 +157,6 @@ public class TextUtils {
     }
 
     private static javafx.scene.Node createElement(jodd.lagarto.dom.Node jerryNode, Stack<TextModifiers> modifiers) {
-        if (null == jerryNode || null == jerryNode.getNodeValue()) {
-            if (null != jerryNode && "image".equals(jerryNode.getNodeName())) {
-                return jerryToImage(jerryNode);
-            }
-            return null;
-        }
         if (modifiers.contains(TextModifiers.LINK)) {
             Hyperlink hyperlink = new Hyperlink(jerryNode.getNodeValue());
             hyperlink.setFont(TextFontProvider.of(modifiers).getFont());
@@ -168,16 +172,14 @@ public class TextUtils {
             }
             return hyperlink;
         } else if (modifiers.contains(TextModifiers.SUBTITLE) || modifiers.contains(TextModifiers.TITLE)) {
-            Text text = new Text("\n\t" + jerryNode.getNodeValue()
+            Text text = new Text(jerryNode.getNodeValue()
                     .replaceAll("&gt;", ">")
                     .replaceAll("&lt;", "<")
-                    .replaceAll("</?[\\w\\d=\":\\-\\s]*/?>", "") + '\n');
+                    .replaceAll("</?[\\w\\d=\":\\-\\s]*/?>", ""));
             text.setFont(TextFontProvider.of(modifiers).getFont());
             return text;
         } else {
-            Text text = modifiers.lastElement().equals(TextModifiers.P)
-                    ? new Text('\t' + jerryNode.getNodeValue())
-                    : new Text(jerryNode.getNodeValue());
+            Text text = new Text(jerryNode.getNodeValue());
             text.setFont(TextFontProvider.of(modifiers).getFont());
             return text;
         }

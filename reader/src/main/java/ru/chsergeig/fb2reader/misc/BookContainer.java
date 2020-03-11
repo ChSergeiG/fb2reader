@@ -1,26 +1,26 @@
 package ru.chsergeig.fb2reader.misc;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.TextAlignment;
 import jodd.jerry.Jerry;
 import jodd.util.Base64;
 import ru.chsergeig.fb2reader.BookHolder;
+import ru.chsergeig.fb2reader.elements.MainFlowPane;
+import ru.chsergeig.fb2reader.elements.TextFlowContainer;
 import ru.chsergeig.fb2reader.mapping.fictionbook.FictionBook;
-import ru.chsergeig.fb2reader.util.TextUtils;
 import ru.chsergeig.fb2reader.util.enumeration.TextFontProvider;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
+import static ru.chsergeig.fb2reader.util.TextUtils.jerryToParagraphs;
 import static ru.chsergeig.fb2reader.util.TextUtils.jerryToString;
-import static ru.chsergeig.fb2reader.util.TextUtils.jerryToTexts;
 import static ru.chsergeig.fb2reader.util.Utils.safeExecute;
 import static ru.chsergeig.fb2reader.util.Utils.safeExtractValue;
 import static ru.chsergeig.fb2reader.util.enumeration.InCaseOfFail.THROW_EXCEPTION;
@@ -30,7 +30,7 @@ public class BookContainer {
     private final BookContainer parent;
     private final Jerry element;
     private final List<BookContainer> children = new LinkedList<>();
-    private List<javafx.scene.Node> content;
+    private List<TextFlowContainer> content;
     private String title;
 
     public BookContainer(Jerry root) {
@@ -46,36 +46,45 @@ public class BookContainer {
                 .forEach(node -> children.add(new BookContainer(this, node)));
     }
 
-    public static void showCover(TextFlow main) {
+    public static void showCover(MainFlowPane pane) {
         Platform.runLater(() -> {
-            ObservableList<Node> nodes = main.getChildren();
+            List<TextFlowContainer> containers = new ArrayList<>();
             FictionBook book = BookHolder.getFictionBook();
-            nodes.clear();
             safeExecute(() -> {
                 Text title = new Text(book.getBookTitle());
-                title.setFont(TextFontProvider.TITLE.getFont());
-                nodes.add(title);
-                TextUtils.addEmptyLine(nodes);
+                title.setFont(TextFontProvider.TITLE_BOLD.getFont());
+                TextFlowContainer titleContainer = new TextFlowContainer();
+                titleContainer.setAlignment(TextAlignment.CENTER);
+                titleContainer.getChildren().add(title);
+                containers.add(titleContainer);
             }, THROW_EXCEPTION);
             safeExecute(() -> {
-                nodes.addAll(book.getMyHeader().getTexts());
-                TextUtils.addEmptyLine(nodes);
+                containers.addAll(book.getMyHeader().getTexts());
             }, THROW_EXCEPTION);
             safeExecute(() -> {
                 if (null != book.getCoverpage()) {
-                    TextUtils.addEmptyLine(nodes);
                     ImageView image = new ImageView();
-                    image.setImage(new Image(new ByteArrayInputStream(Base64.decode(book.getCoverpage().getValue()))));
+                    Image raster = new Image(new ByteArrayInputStream(Base64.decode(book.getCoverpage().getValue())));
+                    if (raster.getHeight() > 400d) {
+                        image.setFitHeight(400d);
+                        image.setPreserveRatio(true);
+                    }
+                    if (raster.getWidth() > 400d) {
+                        image.setFitWidth(400d);
+                        image.setPreserveRatio(true);
+                    }
+                    image.setImage(raster);
                     image.setFitHeight(400.0d);
-                    image.setPreserveRatio(true);
-                    nodes.add(image);
-                    TextUtils.addEmptyLine(nodes);
+                    TextFlowContainer imgContainer = new TextFlowContainer();
+                    imgContainer.getChildren().add(image);
+                    imgContainer.setAlignment(TextAlignment.CENTER);
+                    containers.add(imgContainer);
                 }
             }, THROW_EXCEPTION);
             safeExecute(() -> {
-                nodes.addAll(book.getMyFooter().getTexts());
-                TextUtils.addEmptyLine(nodes);
+                containers.addAll(book.getMyFooter().getTexts());
             }, THROW_EXCEPTION);
+            pane.showParagraphs(containers);
         });
     }
 
@@ -83,10 +92,10 @@ public class BookContainer {
         return children;
     }
 
-    public List<javafx.scene.Node> getContent() {
+    public List<TextFlowContainer> getContent() {
         if (null == content) {
             content = new LinkedList<>();
-            content.addAll(jerryToTexts(element));
+            content.addAll(jerryToParagraphs(element));
         }
         return content;
     }
@@ -96,7 +105,7 @@ public class BookContainer {
             title = safeExtractValue(() -> jerryToString(StreamSupport.stream(element.children().spliterator(), false)
                     .filter(node -> node.get(0).getNodeName().equals("title"))
                     .findFirst()
-                    .get()), "---------");
+                    .get()), safeExtractValue(() -> element.get(0).getChildNodes()[0].getNodeName(), "------"));
         }
         return title;
     }

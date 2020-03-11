@@ -1,11 +1,11 @@
 package ru.chsergeig.fb2reader.mapping.fictionbook.body;
 
-import javafx.scene.Node;
 import jodd.jerry.Jerry;
+import ru.chsergeig.fb2reader.elements.TextFlowContainer;
 
 import java.util.List;
 
-import static ru.chsergeig.fb2reader.util.TextUtils.jerryToTexts;
+import static ru.chsergeig.fb2reader.util.TextUtils.jerryToParagraphs;
 
 public class MyHeaderFooter {
 
@@ -15,8 +15,8 @@ public class MyHeaderFooter {
         this.element = element;
     }
 
-    public List<Node> getTexts() {
-        return jerryToTexts(element);
+    public List<TextFlowContainer> getTexts() {
+        return jerryToParagraphs(element);
     }
 
 }

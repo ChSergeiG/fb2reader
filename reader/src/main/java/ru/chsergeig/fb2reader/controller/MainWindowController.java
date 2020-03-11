@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -16,12 +15,12 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ru.chsergeig.fb2reader.BookHolder;
 import ru.chsergeig.fb2reader.Xmain;
+import ru.chsergeig.fb2reader.elements.MainFlowPane;
 import ru.chsergeig.fb2reader.mapping.cache.BookCache;
 import ru.chsergeig.fb2reader.mapping.fictionbook.FictionBook;
 import ru.chsergeig.fb2reader.misc.BookContainer;
@@ -45,11 +44,11 @@ public class MainWindowController implements Initializable {
     @FXML
     protected GridPane gridPane;
     @FXML
-    protected TextFlow main;
-    @FXML
     protected TreeView<BookContainer> tree;
     @FXML
     protected Menu lastBooks;
+    @FXML
+    public MainFlowPane flowPane;
 
     @FXML
     protected void handleSelectFilePressed(ActionEvent event) {
@@ -62,7 +61,7 @@ public class MainWindowController implements Initializable {
         CacheUtils.getBookCache().addEntry(file.toPath(), file.getAbsolutePath(), LocalDateTime.now());
         BookHolder.setBook(file.toPath());
         fillTree();
-        BookContainer.showCover(main);
+        BookContainer.showCover(flowPane);
     }
 
     @FXML
@@ -119,23 +118,18 @@ public class MainWindowController implements Initializable {
             };
             cell.setOnMouseClicked(event -> {
                 TreeItem<BookContainer> treeItem = cell.getTreeItem();
-                if (null == cell.getItem().getParent()) {
-                    BookContainer.showCover(main);
+                if (null == cell.getItem() || null == cell.getItem().getParent()) {
+                    BookContainer.showCover(flowPane);
                     return;
                 }
                 if (treeItem.getChildren().size() == 0) {
-                    Platform.runLater(() -> {
-                        ObservableList<Node> nodes = main.getChildren();
-                        nodes.clear();
-                        nodes.addAll(cell.getItem().getContent());
-                    });
+                    Platform.runLater(() -> flowPane.showParagraphs(cell.getItem().getContent()));
                 }
             });
             Platform.runLater(() -> cell.prefWidthProperty().bind(tree.widthProperty().subtract(5.0)));
             return cell;
         });
-        Platform.runLater(() -> main.prefWidthProperty().bind(main.getScene().widthProperty().multiply(0.75)));
-
+        Platform.runLater(() -> flowPane.prefWidthProperty().bind(flowPane.getScene().widthProperty().multiply(0.75)));
         ObservableList<MenuItem> items = lastBooks.getItems();
         items.clear();
         BookCache bookCache = CacheUtils.getBookCache();
@@ -150,7 +144,7 @@ public class MainWindowController implements Initializable {
             item.setOnAction(event -> {
                 BookHolder.setBook(Paths.get(entry.fileName));
                 fillTree();
-                BookContainer.showCover(main);
+                BookContainer.showCover(flowPane);
             });
             items.add(item);
         });
@@ -160,7 +154,7 @@ public class MainWindowController implements Initializable {
                 .ifPresent(entry -> {
                     BookHolder.setBook(Paths.get(entry.fileName));
                     fillTree();
-                    BookContainer.showCover(main);
+                    BookContainer.showCover(flowPane);
                 });
     }
 
@@ -185,5 +179,4 @@ public class MainWindowController implements Initializable {
         }
         return result;
     }
-
 }
