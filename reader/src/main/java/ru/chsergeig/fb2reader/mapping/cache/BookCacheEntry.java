@@ -14,6 +14,8 @@ public class BookCacheEntry implements Comparable<BookCacheEntry> {
     public String hash;
     @JsonProperty("date")
     public LocalDateTime lastLoadedDate;
+    @JsonProperty("extractedTo")
+    public String extractedPath;
 
     @Override
     public int compareTo(BookCacheEntry entry) {

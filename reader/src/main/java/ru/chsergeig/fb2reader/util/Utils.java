@@ -5,11 +5,27 @@ import jodd.lagarto.dom.Attribute;
 import jodd.lagarto.dom.Node;
 import ru.chsergeig.fb2reader.util.enumeration.InCaseOfFail;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import static java.nio.charset.Charset.forName;
 
 public final class Utils {
+
+    private static final Charset[] ZIP_CHARSETS = {StandardCharsets.UTF_8, forName("CP866"), forName("CP437")};
 
     private Utils() {
     }
@@ -73,10 +89,10 @@ public final class Utils {
         String attribute = "";
         int i = 0;
         while (attribute != null) {
-            Attribute jerryNodeAttribute ;
+            Attribute jerryNodeAttribute;
             try {
                 jerryNodeAttribute = jerryNode.getAttribute(i++);
-                if (null ==  jerryNodeAttribute) {
+                if (null == jerryNodeAttribute) {
                     return null;
                 }
             } catch (NullPointerException ignore) {
@@ -89,4 +105,54 @@ public final class Utils {
         }
         return null;
     }
+
+    public static BookPathContainer readAsRegularFile(Path path) {
+        try {
+            List<String> lines = Files.readAllLines(path, forName(TextUtils.getValidCharset(path)));
+            return new BookPathContainer(Jerry.jerry(String.join("\n", lines)), path);
+        } catch (IOException e) {
+            throw new RuntimeException("Cant parse book", e);
+        }
+    }
+
+    public static BookPathContainer readAsZipFile(Path path) {
+        Path extractedPath = null;
+        for (Charset charset : ZIP_CHARSETS) {
+            try {
+                ZipFile zipFile = new ZipFile(path.toFile(), charset);
+                Optional<? extends ZipEntry> zipEntry = zipFile.stream()
+                        .filter(entry -> entry.getName().toLowerCase().endsWith(".fb2"))
+                        .findFirst();
+                if (zipEntry.isPresent()) {
+                    InputStream fileInputStream = zipFile.getInputStream(zipEntry.get());
+                    extractedPath = Paths.get(System.getProperty("java.io.tmpdir"), "fb2r_" + UUID.randomUUID().toString() + ".fb2");
+                    Files.copy(fileInputStream, extractedPath);
+                }
+                break;
+            } catch (IOException e) {
+                throw new RuntimeException("Cant load zip file", e);
+            } catch (IllegalArgumentException ignore) {
+            }
+        }
+        return readAsRegularFile(extractedPath);
+    }
+
+    public static class BookPathContainer {
+        Jerry book;
+        Path path;
+
+        public BookPathContainer(Jerry book, Path path) {
+            this.book = book;
+            this.path = path;
+        }
+
+        public Jerry getBook() {
+            return book;
+        }
+
+        public Optional<Path> getPath() {
+            return null == path ? Optional.empty() : Optional.of(path);
+        }
+    }
+
 }
