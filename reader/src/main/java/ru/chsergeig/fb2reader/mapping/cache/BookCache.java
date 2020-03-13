@@ -92,8 +92,12 @@ public class BookCache {
         }
     }
 
-    public Path getByHash(String hash) {
+    public Optional<BookCacheEntry> getByHash(String hash) {
+        return books.stream().filter(book -> book.hash.equals(hash)).findAny();
+    }
 
+    public Optional<BookCacheEntry> getByFileName(String fileName) {
+        return books.stream().filter(book -> book.fileName.equals(fileName)).findAny();
     }
 
 }

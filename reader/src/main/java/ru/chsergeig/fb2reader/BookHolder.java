@@ -3,18 +3,23 @@ package ru.chsergeig.fb2reader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import jodd.jerry.Jerry;
+import ru.chsergeig.fb2reader.mapping.cache.BookCacheEntry;
 import ru.chsergeig.fb2reader.mapping.fictionbook.FictionBook;
 import ru.chsergeig.fb2reader.mapping.fictionbook.common.Author;
 import ru.chsergeig.fb2reader.misc.BookInfoTableRow;
 import ru.chsergeig.fb2reader.util.CacheUtils;
 import ru.chsergeig.fb2reader.util.Utils;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.io.FilenameUtils.getExtension;
 import static ru.chsergeig.fb2reader.util.Utils.readAsRegularFile;
 import static ru.chsergeig.fb2reader.util.Utils.readAsZipFile;
 
@@ -29,7 +34,17 @@ public class BookHolder {
     }
 
     public static void setBook(Path pathFile) {
-        CacheUtils.getBookCache()
+        Optional<BookCacheEntry> bookCacheEntry = CacheUtils.getBookCache().getByFileName(pathFile.toString());
+        if (bookCacheEntry.isPresent() && getExtension(pathFile.toString()).equals("zip")) {
+            String extractedPath = bookCacheEntry.get().extractedPath;
+            if (Files.exists(Paths.get(extractedPath))) {
+                Utils.BookPathContainer bookPathContainer = readAsRegularFile(Paths.get(extractedPath));
+                book = bookPathContainer.getBook();
+                mapBookToFb2();
+                CacheUtils.getBookCache().addEntry(pathFile, bookPathContainer.getPath().get(), fictionBook.getBookTitle(), LocalDateTime.now());
+                return;
+            }
+        }
 
 
         if (pathFile.toString().toLowerCase().endsWith(".fb2")) {
